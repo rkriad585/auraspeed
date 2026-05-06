@@ -2,53 +2,49 @@
 
 Thank you for your interest in contributing to AuraSpeed! This guide will help you get started with the development workflow and coding standards.
 
-## Development Setup
+## 📋 Before You Start
 
-Clone the repository and install dependencies:
+- Read the [Code of Conduct](CODE_OF_CONDUCT.md)
+- Check [existing issues](https://github.com/rkriad585/auraspeed/issues) before opening a new one
+- For big changes — open an issue first to discuss
+
+## 🛠️ Development Setup
 
 ```bash
+# 1. Fork and clone
 git clone https://github.com/rkriad585/auraspeed.git
 cd auraspeed
+
+# 2. Install dependencies
 go mod download
-```
 
-### Build
-
-```bash
-# Quick build
+# 3. Build the project
 go build -o auraspeed ./cmd/main.go
 
 # Or use build scripts
-./build.sh          # Unix
-.\build.ps1          # Windows
+./build.sh          # Unix (bash/zsh/fish)
+.\build.ps1          # Windows (PowerShell)
+
+# 4. Run tests to verify setup
+go test ./... -v
+
+# 5. Start development
+# TUI mode: auraspeed tui
+# CLI mode: auraspeed speedtest
 ```
 
-## Project Structure
-
-AuraSpeed follows standard Go project layout conventions:
-
-| Directory | Purpose |
-|-----------|---------|
-| `cmd/` | Application entry points (main package, CLI setup) |
-| `internal/` | Private application code (not importable by external projects) |
-| `docs/` | Project documentation |
-| `.github/` | GitHub workflows and community files |
-
-> [!TIP]
-> Code in `internal/` is enforced by the Go compiler — external projects cannot import it. This keeps the public API clean.
-
-## Branch Naming
+## 🌿 Branch Naming
 
 Use descriptive branch names following these patterns:
 
-| Type | Pattern | Example |
-|------|---------|---------|
-| Feature | `feat/description` | `feat/add-dark-mode` |
-| Bug fix | `fix/description` | `fix/speedtest-panic` |
-| Docs | `docs/description` | `docs/api-reference` |
-| Refactor | `refactor/description` | `refactor/tui-cleanup` |
+| Type      | Pattern                  | Example                    |
+|-----------|--------------------------|----------------------------|
+| Feature   | `feat/short-description` | `feat/add-dark-mode`       |
+| Bug fix   | `fix/short-description`  | `fix/speedtest-panic`      |
+| Docs      | `docs/short-description` | `docs/api-reference`       |
+| Refactor  | `refactor/description`   | `refactor/tui-cleanup`      |
 
-## Commit Messages
+## 📝 Commit Messages
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/) for clear, automated changelog generation:
 
@@ -70,18 +66,42 @@ docs: update API reference for config package
 refactor: simplify TUI rendering logic
 ```
 
-## Pull Request Process
+## 🔄 Pull Request Process
 
 1. Create a branch from `main` using the [branch naming convention](#branch-naming)
-2. Add tests for any new functionality
+2. Make your changes with tests
 3. Run the test suite: `go test ./... -v -cover`
 4. Run static analysis: `go vet ./...`
 5. Run formatting: `go fmt ./...`
 6. Update documentation if behavior changes
-7. Open a PR with a clear description of the changes
+7. Open a PR with a clear description
 
 > [!IMPORTANT]
 > All PRs must pass CI checks and include appropriate test coverage before merging.
+
+## ✅ PR Checklist
+
+- [ ] Tests added for new functionality
+- [ ] All existing tests pass
+- [ ] Docs updated if behavior changed
+- [ ] Commit messages follow convention
+- [ ] No merge conflicts with main
+
+## 🧪 Running Tests
+
+```bash
+# Verbose output
+go test ./... -v
+
+# With coverage report
+go test ./... -cover
+
+# Run specific test
+go test ./internal/speedtest/... -v
+```
+
+> [!TIP]
+> Aim for meaningful test coverage on new code. Tests go in `_test.go` files next to the source.
 
 ## Coding Standards
 
@@ -90,6 +110,7 @@ refactor: simplify TUI rendering logic
 - Document all exported functions using [godoc](https://godoc.org) style
 - Keep functions small and focused on a single responsibility
 - Use meaningful variable and function names
+- Avoid global state when possible
 
 ### Example Godoc Comment
 
@@ -101,22 +122,21 @@ func CalculateSpeed(bytes int64, duration float64) float64 {
 }
 ```
 
-## Testing
+## 🏗️ Project Structure
 
-Run the full test suite with:
+AuraSpeed follows standard Go project layout conventions:
 
-```bash
-# Verbose output
-go test ./... -v
-
-# With coverage report
-go test ./... -cover
-```
+| Directory | Purpose |
+|-----------|---------|
+| `cmd/` | Application entry points (main package, CLI setup) |
+| `internal/` | Private application code (not importable by external projects) |
+| `docs/` | Project documentation |
+| `.github/` | GitHub workflows and community files |
 
 > [!TIP]
-> Aim for meaningful test coverage on new code. Tests go in `_test.go` files next to the source.
+> Code in `internal/` is enforced by the Go compiler — external projects cannot import it. This keeps the public API clean.
 
-## Build Commands
+## 📦 Build Commands
 
 | Command | Description |
 |---------|-------------|
@@ -125,12 +145,10 @@ go test ./... -cover
 | `./build.sh` | Unix: build for all platforms |
 | `goreleaser build --snapshot --clean` | GoReleaser snapshot build |
 
-## Getting Help
+## 🆘 Getting Help
 
 - Open a [GitHub issue](https://github.com/rkriad585/auraspeed/issues) for bugs or feature requests
 - Check existing issues before creating a new one
 - Include your OS, Go version, and AuraSpeed version when reporting bugs
-
-Thank you for contributing to AuraSpeed! 🚀
 
 Thank you for contributing to AuraSpeed! 🚀
