@@ -22,7 +22,7 @@ Thank you for your interest in contributing to AuraSpeed!
 
 ### Development Setup
 ```bash
-git clone https://github.com/yourusername/auraspeed.git
+git clone https://github.com/rkriad585/auraspeed.git
 cd auraspeed
 go mod download
 make build
