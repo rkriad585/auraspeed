@@ -10,7 +10,7 @@ require (
 	github.com/rivo/tview v0.42.0
 	github.com/rs/zerolog v1.33.0
 	github.com/shirou/gopsutil/v3 v3.24.5
-	github.com/showwin/speedtest-go v1.7.10
+	github.com/showwin/speedtest-go v1.7.9
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.19.0
 )

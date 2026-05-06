@@ -94,6 +94,10 @@ func NewSpeedtestCommand() *cobra.Command {
 
 			s := targets[0]
 
+			if s.Context == nil {
+				s.Context = client
+			}
+
 			if err := s.DownloadTest(); err != nil {
 				return fmt.Errorf("download test failed: %w", err)
 			}

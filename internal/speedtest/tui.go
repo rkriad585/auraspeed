@@ -61,8 +61,8 @@ func RunTUI() error {
 	pingBox = createMetricBox("LATENCY (ms)", tcell.ColorYellow)
 	jitterBox = createMetricBox("JITTER (ms)", tcell.ColorOrange)
 
-	graphBox = tview.NewTextView().SetDynamicColors(true).SetTextAlign(tview.AlignCenter)
-	graphBox.SetBorder(true).SetTitle(" REAL-TIME THROUGHPUT ").SetBorderColor(tcell.ColorGray)
+	graphBox = tview.NewTextView().SetDynamicColors(false).SetTextAlign(tview.AlignCenter)
+	graphBox.SetBorder(true).SetTitle(" STATUS ").SetBorderColor(tcell.ColorGray)
 
 	grid := tview.NewGrid().
 		SetRows(3, 2, 1, 10, 0, 1).
@@ -79,7 +79,7 @@ func RunTUI() error {
 	grid.AddItem(jitterBox, 4, 3, 1, 1, 0, 0, false)
 
 	footer := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true).
-		SetText("[white]Press [yellow]C [white]Copy Link | [yellow]R [white]Restart | [yellow]H [white]History | [red]Esc [white]Close Popups | [red]Ctrl+C [white]Exit")
+		SetText("[white]Press [yellow]C [white]Copy Results | [yellow]R [white]Restart | [yellow]H [white]History | [red]Esc [white]Close Popups | [red]Ctrl+C [white]Exit")
 	grid.AddItem(footer, 5, 0, 1, 4, 0, 0, false)
 
 	pages.AddPage("main", grid, true, true)
@@ -223,12 +223,33 @@ func runAdvancedTest() {
 	}
 
 	s := targets[0]
+	if s == nil {
+		updateStatus("[red]Error: Server is nil.")
+		logger.Error("Server from FindServer is nil")
+		return
+	}
+	if s.URL == "" && s.Host == "" {
+		updateStatus("[red]Error: Server has no URL or Host.")
+		logger.ErrorWithFields("Server missing URL/Host", map[string]interface{}{"server": s})
+		return
+	}
+
+	// Re-initialize server context to avoid nil pointer panic
+	if s.Context == nil {
+		logger.Warn("Server context is nil, setting to speedtest client")
+		s.Context = speedtestClient
+	}
+
 	app.QueueUpdateDraw(func() {
 		infoBar.SetText(fmt.Sprintf("[yellow]ISP: [white]%s (%s)  [yellow]Server: [white]%s", user.Isp, user.IP, s.Name))
 		pingBox.SetText(fmt.Sprintf("\n%d", s.Latency.Milliseconds()))
 	})
 
 	updateStatus("[springgreen]Running Download Test...")
+
+	if s.DLSpeed == 0 && s.ULSpeed == 0 {
+		logger.Warn("Server may not be properly initialized")
+	}
 
 	err = s.DownloadTest()
 

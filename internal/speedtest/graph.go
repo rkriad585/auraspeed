@@ -1,10 +1,9 @@
 package speedtest
 
 import (
+	"fmt"
 	"sync"
 	"time"
-
-	"github.com/guptarohit/asciigraph"
 )
 
 var (
@@ -41,8 +40,50 @@ func refreshGraph() {
 	if len(data) > 40 {
 		data = data[len(data)-40:]
 	}
-	graph := asciigraph.Plot(data, asciigraph.Height(6), asciigraph.Width(75))
+
+	// Generate simple ASCII graph without escape sequences
+	graph := generateSimpleGraph(data)
 	app.QueueUpdateDraw(func() {
 		graphBox.SetText(graph)
 	})
+}
+
+// generateSimpleGraph creates a simple text-based graph
+func generateSimpleGraph(data []float64) string {
+	if len(data) == 0 {
+		return "No data yet..."
+	}
+
+	maxVal := 0.0
+	for _, v := range data {
+		if v > maxVal {
+			maxVal = v
+		}
+	}
+	if maxVal == 0 {
+		maxVal = 1
+	}
+
+	height := 6
+	width := 40
+	graph := ""
+
+	for h := height; h > 0; h-- {
+		threshold := maxVal * float64(h) / float64(height)
+		line := ""
+		for _, v := range data {
+			if len(line) >= width {
+				break
+			}
+			if v >= threshold {
+				line += "█"
+			} else {
+				line += " "
+			}
+		}
+		graph += fmt.Sprintf("%6.1f |%s\n", maxVal*float64(h)/float64(height), line)
+	}
+	graph += "       +" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─"
+
+	return graph
 }
