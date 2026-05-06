@@ -1,4 +1,4 @@
-version: 1
+version: 2
 
 project_name: auraspeed
 
@@ -25,17 +25,6 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "arm64" }}arm64
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Match.ExtraPairs.checksum }}
-      {{- printf "_%s" .Match.ExtraPairs.checksum }}{{- end }}
-    extra_files:
-      - LICENSE
-      - README.md
 
 checksum:
   name_template: 'checksums.txt'
@@ -49,9 +38,9 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
-      - 'Merge pull request'
+      - Merge pull request
 
 release:
   github:
-    owner: AuraSpeed
+    owner: rkriad585
     name: auraspeed
