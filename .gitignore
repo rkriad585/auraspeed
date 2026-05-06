@@ -1,0 +1,41 @@
+# Build artifacts
+auraspeed.exe
+auraspeed_step*.exe
+auraspeed-*
+
+# Go
+*.exe
+*.test
+*.out
+*.prof
+go.sum
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Test coverage
+coverage.txt
+coverage.html
+*.coverprofile
+
+# Go
+go.sum
+
+# Data files
+history.json
+
+# GoReleaser and CI configs are not ignored

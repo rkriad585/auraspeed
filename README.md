@@ -23,7 +23,7 @@ AuraSpeed is a cross-platform terminal tool for network diagnostics, system moni
 ### From Source
 
 ```bash
-git clone https://github.com/yourusername/auraspeed.git
+git clone https://github.com/rkriad585/auraspeed.git
 cd auraspeed
 make build
 ```
@@ -35,7 +35,7 @@ make build-windows
 
 ### Pre-built Binaries
 
-Download the latest release for your platform from the [releases page](https://github.com/yourusername/auraspeed/releases):
+Download the latest release for your platform from the [releases page](https://github.com/rkriad585/auraspeed/releases):
 
 - **Windows**: `auraspeed-windows-amd64.exe`
 - **Linux**: `auraspeed-linux-amd64`
