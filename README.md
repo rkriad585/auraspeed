@@ -28,6 +28,7 @@ bash build.sh
 - **Speed Test** — Measure download/upload speeds and latency with `auraspeed speedtest`
 - **System Information** — Display CPU, memory, and disk usage via `auraspeed info`
 - **Network Diagnostics** — Run ping, DNS, and host lookups with `auraspeed network`
+- **Web Server** — Start HTTP API server with `auraspeed web` for remote access
 - **Test History** — Track and export past speed tests using `auraspeed history`
 - **Flexible Configuration** — Manage settings via TOML config or `auraspeed config` commands
 - **Clipboard Integration** — Copy results to clipboard with a single keypress in TUI mode
@@ -73,6 +74,26 @@ Download the latest pre-built binary for your platform from the [GitHub Releases
 | macOS (Apple Silicon) | `auraspeed-darwin-arm64` |
 
 ## Usage
+
+### Web Server
+
+Start a web server to access AuraSpeed features via HTTP:
+
+```bash
+auraspeed web
+# Custom port
+auraspeed web --port 3000
+```
+
+**Endpoints:**
+- `GET /` — HTML UI with buttons to run tests
+- `POST /api/speedtest` — Run speed test
+- `GET /api/info` — Get system information
+- `GET /health` — Health check
+
+**Access:** http://localhost:8080
+
+---
 
 ### Interactive TUI
 
