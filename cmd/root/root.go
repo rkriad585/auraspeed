@@ -70,6 +70,9 @@ func Execute() error {
 	return rootCmd.Execute()
 }
 
+// init registers persistent CLI flags and attaches subcommands to the root command.
+// It defines flags for log level, color output, verbosity, and version display, and
+// adds the UI, speedtest, info, network, history, config, version, and web subcommands.
 func init() {
 	rootCmd.PersistentFlags().StringP("log-level", "l", "info", "Log level (debug, info, warn, error)")
 	rootCmd.PersistentFlags().BoolP("no-color", "", false, "Disable colored output")
