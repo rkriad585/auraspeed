@@ -83,4 +83,5 @@ func init() {
 	rootCmd.AddCommand(NewHistoryCommand())
 	rootCmd.AddCommand(NewConfigCommand())
 	rootCmd.AddCommand(newVersionCmd())
+	rootCmd.AddCommand(NewWebCommand())
 }

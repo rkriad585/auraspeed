@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AuraSpeed Web</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        h1 { color: #333; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
+        .result { margin: 20px 0; padding: 20px; background: white; border-radius: 5px; }
+        .metric { display: inline-block; margin: 10px; padding: 20px; background: #e3f2fd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>AuraSpeed Web Interface</h1>
+    <button onclick="runSpeedTest()">Run Speed Test</button>
+    <button onclick="getSystemInfo()">Get System Info</button>
+    <div id="result"></div>
+
+    <script>
+        function runSpeedTest() {
+            document.getElementById('result').innerHTML = '<p>Running speed test...</p>';
+            fetch('/api/speedtest', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result">
+                            <h2>Speed Test Results</h2>
+                            <div class="metric"><h3>Download</h3><p>` + data.download + ` Mbps</p></div>
+                            <div class="metric"><h3>Upload</h3><p>` + data.upload + ` Mbps</p></div>
+                            <div class="metric"><h3>Ping</h3><p>` + data.ping + ` ms</p></div>
+                            <p><strong>ISP:</strong> ` + data.isp + `</p>
+                            <p><strong>Server:</strong> ` + data.server + `</p>
+                        </div>`;
+                })
+                .catch(e => alert('Error: ' + e));
+        }
+
+        function getSystemInfo() {
+            fetch('/api/info')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result">
+                            <h2>System Information</h2>
+                            <p><strong>OS:</strong> ` + data.OS + `</p>
+                            <p><strong>CPU:</strong> ` + data.CPU + `</p>
+                            <p><strong>Memory:</strong> ` + data.MemoryUsed + ` / ` + data.MemoryTotal + `</p>
+                            <p><strong>Disk:</strong> ` + data.DiskUsed + ` / ` + data.DiskTotal + `</p>
+                            <p><strong>Hostname:</strong> ` + data.Hostname + `</p>
+                        </div>`;
+                })
+                .catch(e => alert('Error: ' + e));
+        }
+    </script>
+</body>
+</html>
