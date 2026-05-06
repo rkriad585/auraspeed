@@ -1,79 +1,103 @@
 # AuraSpeed
 
-AuraSpeed is a cross-platform terminal tool for network diagnostics, system monitoring, and performance optimization. Built with Go, it provides an interactive TUI (Terminal User Interface) mode with real-time graphs, comprehensive speed testing, and system information display.
+[![Go Version](https://img.shields.io/badge/Go-1.25.0-00ADD8?style=flat&logo=go)](https://go.dev/)
+[![MIT License](https://img.shields.io/github/license/rkriad585/auraspeed?color=blue)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/rkriad585/auraspeed)](https://github.com/rkriad585/auraspeed/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rkriad585/auraspeed)](https://goreportcard.com/report/github.com/rkriad585/auraspeed)
+
+Cross-platform terminal tool for network diagnostics, system monitoring, and performance optimization. Built with Go 1.25.0, it provides an interactive TUI with real-time graphs, comprehensive speed testing, and system information display.
+
+## Quick Start
+
+Get started in seconds with a pre-built binary:
+
+```bash
+# Download the latest release for your platform from https://github.com/rkriad585/auraspeed/releases
+# Or build from source:
+git clone https://github.com/rkriad585/auraspeed.git
+cd auraspeed
+# Linux/macOS
+bash build.sh
+# Windows
+.\build.ps1
+```
 
 ## Features
 
-- **Interactive TUI Mode** - Full-featured terminal interface with real-time throughput graphs
-- **Speed Test** - Measure download/upload speeds with configurable parallel connections
-- **System Information** - View CPU, memory, disk usage, and hostname
-- **Network Diagnostics** - Ping, traceroute, and DNS lookup utilities
-- **Test History** - Track and export speed test results (JSON/TSV formats)
-- **Configurable** - TOML-based configuration with sensible defaults
-- **Command Aliases** - Quick shortcuts (`st`, `si`, `net`, `hist`)
-- **Clipboard Integration** - Copy results with a keypress
-- **Cross-Platform** - Works on Windows, Linux, and macOS (Intel & Apple Silicon)
+- **Interactive TUI** — Launch with `auraspeed tui` for real-time throughput graphs and live metrics
+- **Speed Test** — Measure download/upload speeds and latency with `auraspeed speedtest`
+- **System Information** — Display CPU, memory, and disk usage via `auraspeed info`
+- **Network Diagnostics** — Run ping, DNS, and host lookups with `auraspeed network`
+- **Test History** — Track and export past speed tests using `auraspeed history`
+- **Flexible Configuration** — Manage settings via TOML config or `auraspeed config` commands
+- **Clipboard Integration** — Copy results to clipboard with a single keypress in TUI mode
+- **Cross-Platform** — Supports Windows, Linux, and macOS (Intel & Apple Silicon)
+- **Command Aliases** — Quick shortcuts: `st` (speedtest), `si` (info), `net` (network), `hist` (history)
 
 ## Installation
 
 ### Prerequisites
 
-- Go 1.21 or higher (for building from source)
+- Go 1.25.0+ (only required for building from source)
 
 ### From Source
+
+Clone the repository and run the appropriate build script for your platform:
 
 ```bash
 git clone https://github.com/rkriad585/auraspeed.git
 cd auraspeed
-make build
 ```
 
-For Windows:
+**Linux/macOS (Bash/Zsh/Fish):**
 ```bash
-make build-windows
+bash build.sh
 ```
+
+**Windows (PowerShell):**
+```powershell
+.\build.ps1
+```
+
+The compiled binary will be output to the project root.
 
 ### Pre-built Binaries
 
-Download the latest release for your platform from the [releases page](https://github.com/rkriad585/auraspeed/releases):
+Download the latest pre-built binary for your platform from the [GitHub Releases page](https://github.com/rkriad585/auraspeed/releases):
 
-- **Windows**: `auraspeed-windows-amd64.exe`
-- **Linux**: `auraspeed-linux-amd64`
-- **macOS (Intel)**: `auraspeed-darwin-amd64`
-- **macOS (Apple Silicon)**: `auraspeed-darwin-arm64`
-
-### Build All Platforms
-
-```bash
-make build-all
-```
+| Platform | Binary Name |
+|----------|-------------|
+| Windows (amd64) | `auraspeed-windows-amd64.exe` |
+| Linux (amd64) | `auraspeed-linux-amd64` |
+| macOS (Intel) | `auraspeed-darwin-amd64` |
+| macOS (Apple Silicon) | `auraspeed-darwin-arm64` |
 
 ## Usage
 
-### TUI Mode (Interactive)
+### Interactive TUI
 
-Launch the full interactive terminal interface:
+Launch the full-featured terminal interface with real-time graphs:
 
 ```bash
 auraspeed tui
 ```
 
 **TUI Keyboard Shortcuts:**
-- `R` - Restart speed test
-- `C` - Copy results to clipboard
-- `H` - View test history
-- `Esc` - Close popups
-- `Ctrl+C` - Exit
+- `R` — Restart speed test
+- `C` — Copy results to clipboard
+- `H` — View test history
+- `Esc` — Close popups
+- `Ctrl+C` — Exit
 
-### Speed Test (CLI)
+### Speed Test
 
-Run a quick speed test from the command line:
+Run a speed test from the CLI:
 
 ```bash
 auraspeed speedtest
 ```
 
-**With specific server:**
+**With a specific server:**
 ```bash
 auraspeed speedtest --server-id 1234
 ```
@@ -85,13 +109,13 @@ auraspeed speedtest --json
 
 ### System Information
 
-Display system details:
+Display CPU, memory, and disk usage:
 
 ```bash
 auraspeed info
 ```
 
-Output example:
+Example output:
 ```
 System Information
 ------------------
@@ -104,14 +128,11 @@ Hostname: DESKTOP-ABC123
 
 ### Network Diagnostics
 
+Run network diagnostics with the `network` subcommand:
+
 **Ping a host:**
 ```bash
 auraspeed network ping google.com
-```
-
-**Traceroute:**
-```bash
-auraspeed network traceroute google.com
 ```
 
 **DNS lookup:**
@@ -119,9 +140,16 @@ auraspeed network traceroute google.com
 auraspeed network dns google.com
 ```
 
-### View Test History
+**Host lookup:**
+```bash
+auraspeed network host google.com
+```
 
-**Show all history:**
+### Test History
+
+View and export past speed test results:
+
+**List all history:**
 ```bash
 auraspeed history
 ```
@@ -131,36 +159,31 @@ auraspeed history
 auraspeed history --limit 10
 ```
 
-**Export to file (auto-detects format from extension):**
+**Export to JSON/TSV:**
 ```bash
 auraspeed history --export results.json
 auraspeed history --export results.tsv
 ```
 
-**Clear all history:**
-```bash
-auraspeed history --clear
-```
+### Configuration Management
 
-### Configuration
+Manage AuraSpeed settings via CLI:
 
 **View all settings:**
 ```bash
 auraspeed config view
 ```
 
-**View specific section:**
+**View a specific section:**
 ```bash
 auraspeed config view speedtest
 auraspeed config view ui
-auraspeed config view global
 ```
 
 **Set a value:**
 ```bash
 auraspeed config set speedtest.timeout 60
 auraspeed config set ui.theme dark
-auraspeed config set ui.savehistory true
 ```
 
 **Reset to defaults:**
@@ -170,11 +193,11 @@ auraspeed config reset
 
 ### Command Aliases
 
-Quick shortcuts are available:
-- `auraspeed st` = `auraspeed speedtest`
-- `auraspeed si` = `auraspeed info`
-- `auraspeed net` = `auraspeed network`
-- `auraspeed hist` = `auraspeed history`
+Use these shortcuts for common commands:
+- `auraspeed st` → `auraspeed speedtest`
+- `auraspeed si` → `auraspeed info`
+- `auraspeed net` → `auraspeed network`
+- `auraspeed hist` → `auraspeed history`
 
 ### Global Flags
 
@@ -186,7 +209,9 @@ auraspeed -v                  # Enable verbose logging
 
 ## Configuration
 
-Config file location: `~/.auraspeed/config.toml` (Windows: `%USERPROFILE%\.auraspeed\config.toml`)
+AuraSpeed uses TOML for configuration via [spf13/viper](https://github.com/spf13/viper). The config file is located at:
+- Linux/macOS: `~/.auraspeed/config.toml`
+- Windows: `%USERPROFILE%\.auraspeed\config.toml`
 
 ### Default Configuration
 
@@ -237,115 +262,65 @@ Config file location: `~/.auraspeed/config.toml` (Windows: `%USERPROFILE%\.auras
 | ui | refreshrate | int | 5 | Refresh rate in seconds |
 | ui | savehistory | bool | true | Save test results to history |
 
-## TUI Mode Screenshot
-
-```
-─── AURASPEED PRO: ADVANCED NETWORK ANALYZER ───
-
-ISP: Comcast (203.0.113.1)  Server: New York, NY
-
-Running Download Test...
-
-   80.0 ┤     ╭╮
-   70.0 ┤    ╭╯╰╮
-   60.0 ┤   ╭╯  ╰╮
-   50.0 ┤  ╭╯    ╰╮
-   40.0 ┤ ╭╯      ╰╮
-   30.0 ┼╭╯        ╰╮
-   20.0 ┤╯           ╰─
-   10.0 ┤
-    0.0 ┼──────────────
-        Download (Mbps)
-
-┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│ DOWNLOAD     │ │  UPLOAD      │ │  LATENCY     │ │   JITTER     │
-│   (Mbps)     │ │    (Mbps)    │ │    (ms)      │ │    (ms)      │
-│              │ │              │ │              │ │              │
-│    85.42     │ │    42.18     │ │      12      │ │      3       │
-└──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
-
-Press C Copy Link | R Restart | H History | Esc Close Popups | Ctrl+C Exit
-```
-
 ## Project Structure
 
 ```
 auraspeed/
 ├── cmd/
-│   ├── main.go           # Entry point
+│   ├── main.go           # Entry point (package main)
 │   └── root/
-│       ├── root.go       # Root command & CLI setup
+│       ├── root.go       # Root command & CLI setup (cobra)
 │       └── commands.go   # All subcommands
 ├── internal/
-│   ├── config/          # Configuration management
-│   ├── info/            # System information
-│   ├── logging/         # Logging utilities
+│   ├── config/          # Configuration management (viper)
+│   ├── info/            # System information (gopsutil)
+│   ├── logging/         # Logging utilities (zerolog)
 │   ├── network/         # Network diagnostics
-│   ├── speedtest/       # Speed test & TUI
+│   ├── speedtest/       # Speed test & TUI (speedtest-go, tview)
 │   └── ui/              # UI command wrapper
-├── Makefile             # Build targets
-├── go.mod               # Go module definition
+├── build.ps1             # PowerShell build script
+├── build.sh              # Bash/Zsh/Fish build script
+├── go.mod               # Go module definition (auraspeed)
 └── README.md            # This file
-```
-
-## Development
-
-### Running Tests
-
-```bash
-make test
-```
-
-### Linting
-
-```bash
-make lint
-```
-
-### Building for Development
-
-```bash
-go build -o auraspeed ./cmd/main.go
 ```
 
 ## Dependencies
 
-- [cobra](https://github.com/spf13/cobra) - CLI framework
-- [viper](https://github.com/spf13/viper) - Configuration management
-- [tview](https://github.com/rivo/tview) - Terminal UI framework
-- [tcell](https://github.com/gdamore/tcell) - Terminal handling
-- [asciigraph](https://github.com/guptarohit/asciigraph) - ASCII graph generation
-- [speedtest-go](https://github.com/showwin/speedtest-go) - Speed test library
-- [gopsutil](https://github.com/shirou/gopsutil) - System information
-- [zerolog](https://github.com/rs/zerolog) - Logging
-- [clipboard](https://github.com/atotto/clipboard) - Clipboard access
+AuraSpeed is built with these excellent Go libraries:
+- [spf13/cobra](https://github.com/spf13/cobra) — CLI framework
+- [spf13/viper](https://github.com/spf13/viper) — Configuration management
+- [rivo/tview](https://github.com/rivo/tview) — Terminal UI framework
+- [gdamore/tcell/v2](https://github.com/gdamore/tcell) — Terminal handling
+- [showwin/speedtest-go](https://github.com/showwin/speedtest-go) — Speed test library
+- [shirou/gopsutil](https://github.com/shirou/gopsutil) — System information
+- [rs/zerolog](https://github.com/rs/zerolog) — Logging
+- [atotto/clipboard](https://github.com/atotto/clipboard) — Clipboard access
+- [guptarohit/asciigraph](https://github.com/guptarohit/asciigraph) — ASCII graph generation
+
+## Documentation
+
+Full documentation is available in the [docs/](docs/) folder:
+
+| Document | Description |
+|----------|-------------|
+| [Getting Started](docs/getting-started.md) | Beginner-friendly setup guide |
+| [API Reference](docs/api-reference.md) | CLI commands and Go functions |
+| [Architecture](docs/architecture.md) | System design and data flow |
 
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
-
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Guidelines
-
-- Follow Go best practices and conventions
-- Add tests for new functionality
-- Update documentation as needed
-- Ensure `make test` and `make lint` pass
+Ensure your changes pass `go test ./...` and adhere to Go best practices.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Inspired by the need for a fast, terminal-based network diagnostics tool
-- Built with excellent Go libraries from the open-source community
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
-
 **Note**: Speed test functionality uses the Speedtest.net infrastructure via the speedtest-go library.
