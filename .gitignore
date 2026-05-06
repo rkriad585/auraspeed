@@ -2,6 +2,7 @@
 auraspeed.exe
 auraspeed_step*.exe
 auraspeed-*
+dist/
 
 # Go
 *.exe
