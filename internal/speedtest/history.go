@@ -100,7 +100,7 @@ func saveToHistory(dl, ul float64, ping int64, isp string) {
 		return
 	}
 
-	if err := os.WriteFile(historyPath, jsonData, 0600); err != nil {
+	if err := os.WriteFile(historyPath, jsonData, 0644); err != nil {
 		logger := logging.Get()
 		logger.Errorf("Failed to write history file: %v", err)
 	}

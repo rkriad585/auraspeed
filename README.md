@@ -37,6 +37,25 @@ bash build.sh
 
 ## Installation
 
+### Quick Install (Recommended)
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/rkriad585/auraspeed/main/install.ps1 | iex
+```
+
+**Linux/macOS (Bash):**
+```bash
+curl -sL https://raw.githubusercontent.com/rkriad585/auraspeed/main/install.sh | bash
+```
+
+The installer will:
+- Download the latest binary to `~/.config/neostore/auraspeed/bin/`
+- Add it to your PATH
+- Print next steps
+
+To uninstall, run: `auraspeed --selfuninstall`
+
 ### Prerequisites
 
 - Go 1.25.0+ (only required for building from source)
@@ -71,7 +90,7 @@ Download the latest pre-built binary for your platform from the [GitHub Releases
 | Windows (amd64) | `auraspeed-windows-amd64.exe` |
 | Linux (amd64) | `auraspeed-linux-amd64` |
 | macOS (Intel) | `auraspeed-darwin-amd64` |
-| macOS (Apple Silicon) | `auraspeed-darwin-arm64` |
+| macOS (Apple Silicon) | `auraspeed-darwin-arm64` | |
 
 ## Usage
 
@@ -291,18 +310,27 @@ auraspeed/
 │   ├── main.go           # Entry point (package main)
 │   └── root/
 │       ├── root.go       # Root command & CLI setup (cobra)
-│       └── commands.go   # All subcommands
+│       ├── commands.go   # All subcommands
+│       ├── web.go        # Web server command
+│       ├── web.html      # Web UI
+│       ├── update.go     # Update command
+│       ├── install.go    # Install command
+│       └── install.sh    # Linux/macOS installer script
 ├── internal/
-│   ├── config/          # Configuration management (viper)
-│   ├── info/            # System information (gopsutil)
-│   ├── logging/         # Logging utilities (zerolog)
-│   ├── network/         # Network diagnostics
-│   ├── speedtest/       # Speed test & TUI (speedtest-go, tview)
-│   └── ui/              # UI command wrapper
+│   ├── config/           # Configuration management (viper)
+│   ├── info/             # System information (gopsutil)
+│   ├── logging/          # Logging utilities (zerolog)
+│   ├── network/          # Network diagnostics
+│   ├── speedtest/        # Speed test & TUI (speedtest-go, tview)
+│   └── ui/               # UI command wrapper
+├── Dockerfile            # Docker container definition
+├── docker-compose.yml    # Docker Compose configuration
+├── auraspeed.service     # systemd service file
+├── install.ps1           # Windows installer script
 ├── build.ps1             # PowerShell build script
 ├── build.sh              # Bash/Zsh/Fish build script
-├── go.mod               # Go module definition (auraspeed)
-└── README.md            # This file
+├── go.mod                # Go module definition (auraspeed)
+└── README.md             # This file
 ```
 
 ## Dependencies

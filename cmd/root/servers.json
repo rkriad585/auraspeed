@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-06T15:58:56.0433739+06:00",
+  "timestamp": "2026-05-09T17:19:36.3266329+06:00",
   "servers": [
     {
       "id": "74757",
@@ -82,20 +82,20 @@
       "host": "speedtest.orangecommunication.org.prod.hosts.ooklaserver.net:8080"
     },
     {
+      "id": "73016",
+      "name": "Dhaka",
+      "url": "http://speedtest.ping.com.bd:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "PiNG - A Brand of ICOM Bangladesh Limited",
+      "host": "speedtest.ping.com.bd:8080"
+    },
+    {
       "id": "73779",
       "name": "Dhaka",
       "url": "http://server.volonetbd.com:8080/speedtest/upload.php",
       "country": "Bangladesh",
       "sponsor": "VOLO NET",
       "host": "server.volonetbd.com.prod.hosts.ooklaserver.net:8080"
-    },
-    {
-      "id": "73945",
-      "name": "Dhaka",
-      "url": "http://speedtest.spectrabd.net:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Spectra Technologies Ltd",
-      "host": "speedtest.spectrabd.net.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "72567",
@@ -106,20 +106,20 @@
       "host": "speedtest.brightstarnetwork.net.bd.prod.hosts.ooklaserver.net:8080"
     },
     {
-      "id": "74525",
-      "name": "Dhaka",
-      "url": "http://speedtest.infocomltd.net:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Infocom Limited",
-      "host": "speedtest.infocomltd.net.prod.hosts.ooklaserver.net:8080"
-    },
-    {
       "id": "73870",
       "name": "Dhaka",
       "url": "http://server.bkbnetwork.com:8080/speedtest/upload.php",
       "country": "Bangladesh",
       "sponsor": "BKB NETWORK",
       "host": "server.bkbnetwork.com.prod.hosts.ooklaserver.net:8080"
+    },
+    {
+      "id": "74525",
+      "name": "Dhaka",
+      "url": "http://speedtest.infocomltd.net:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "Infocom Limited",
+      "host": "speedtest.infocomltd.net.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "33393",
@@ -146,6 +146,14 @@
       "host": "speedtest.razibcommunication.net.prod.hosts.ooklaserver.net:8080"
     },
     {
+      "id": "13242",
+      "name": "Dhaka",
+      "url": "http://speedtest.bnet-bd.com:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "Business Network",
+      "host": "speedtest.bnet-bd.com.prod.hosts.ooklaserver.net:8080"
+    },
+    {
       "id": "65106",
       "name": "Dhaka",
       "url": "http://ookla.inspirebroadband.net:8080/speedtest/upload.php",
@@ -160,14 +168,6 @@
       "country": "Bangladesh",
       "sponsor": "Velocity Networks Ltd",
       "host": "speedtest.velocitynetworksbd.com.prod.hosts.ooklaserver.net:8080"
-    },
-    {
-      "id": "13242",
-      "name": "Dhaka",
-      "url": "http://speedtest.bnet-bd.com:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Business Network",
-      "host": "speedtest.bnet-bd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "54289",
@@ -194,14 +194,6 @@
       "host": "speedtest.radiantbd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
-      "id": "67852",
-      "name": "Dhaka",
-      "url": "http://speedtest.sisbdisp.com:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Star Internet Service",
-      "host": "speedtest.sisbdisp.com.prod.hosts.ooklaserver.net:8080"
-    },
-    {
       "id": "20144",
       "name": "Dhaka",
       "url": "http://st.link3.net:8080/speedtest/upload.php",
@@ -226,20 +218,12 @@
       "host": "speedtest.netexpressbd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
-      "id": "69224",
+      "id": "67852",
       "name": "Dhaka",
-      "url": "http://speedtest.deshcommunications.net:8080/speedtest/upload.php",
+      "url": "http://speedtest.sisbdisp.com:8080/speedtest/upload.php",
       "country": "Bangladesh",
-      "sponsor": "Desh Communications",
-      "host": "speedtest.deshcommunications.net:8080"
-    },
-    {
-      "id": "72354",
-      "name": "Dhaka",
-      "url": "http://speedtest.galaxynetbd.com:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Galaxy Net",
-      "host": "speedtest.galaxynetbd.com.prod.hosts.ooklaserver.net:8080"
+      "sponsor": "Star Internet Service",
+      "host": "speedtest.sisbdisp.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "25021",
@@ -248,6 +232,14 @@
       "country": "Bangladesh",
       "sponsor": "Broad Band Telecom Services Ltd (BBTS)",
       "host": "speedtest.bbts-online.net.prod.hosts.ooklaserver.net:8080"
+    },
+    {
+      "id": "72354",
+      "name": "Dhaka",
+      "url": "http://speedtest.galaxynetbd.com:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "Galaxy Net",
+      "host": "speedtest.galaxynetbd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "52944",
@@ -266,12 +258,12 @@
       "host": "speedtest.businesszoneltd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
-      "id": "64725",
+      "id": "61760",
       "name": "Dhaka",
-      "url": "http://speedtest.smartonlinebd.net:8080/speedtest/upload.php",
+      "url": "http://speedtest.exordonline.com:8080/speedtest/upload.php",
       "country": "Bangladesh",
-      "sponsor": "Smart Online",
-      "host": "speedtest.smartonlinebd.net.prod.hosts.ooklaserver.net:8080"
+      "sponsor": "Exord Online",
+      "host": "speedtest.exordonline.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "69074",
@@ -280,14 +272,6 @@
       "country": "Bangladesh",
       "sponsor": "Tufan Online",
       "host": "speedtest.tufanonline.com.bd.prod.hosts.ooklaserver.net:8080"
-    },
-    {
-      "id": "61760",
-      "name": "Dhaka",
-      "url": "http://speedtest.exordonline.com:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Exord Online",
-      "host": "speedtest.exordonline.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "71011",
@@ -306,20 +290,20 @@
       "host": "speed.xeonbd.com:8080"
     },
     {
-      "id": "64706",
+      "id": "64725",
       "name": "Dhaka",
-      "url": "http://st.mimebd.com:8080/speedtest/upload.php",
+      "url": "http://speedtest.smartonlinebd.net:8080/speedtest/upload.php",
       "country": "Bangladesh",
-      "sponsor": "MiME Broadband",
-      "host": "st.mimebd.com.prod.hosts.ooklaserver.net:8080"
+      "sponsor": "Smart Online",
+      "host": "speedtest.smartonlinebd.net.prod.hosts.ooklaserver.net:8080"
     },
     {
-      "id": "49944",
+      "id": "70859",
       "name": "Dhaka",
-      "url": "http://speedtest.applenetbd.com:8080/speedtest/upload.php",
+      "url": "http://ookla.skyviewonline.com:8080/speedtest/upload.php",
       "country": "Bangladesh",
-      "sponsor": "Apple Net",
-      "host": "speedtest.applenetbd.com.prod.hosts.ooklaserver.net:8080"
+      "sponsor": "Skyview Online Ltd",
+      "host": "ookla.skyviewonline.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "71156",
@@ -330,20 +314,36 @@
       "host": "speedtest.futurenet-bd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
+      "id": "69224",
+      "name": "Dhaka",
+      "url": "http://speedtest.deshcommunications.net:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "Desh Communications",
+      "host": "speedtest.deshcommunications.net:8080"
+    },
+    {
+      "id": "49944",
+      "name": "Dhaka",
+      "url": "http://speedtest.applenetbd.com:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "Apple Net",
+      "host": "speedtest.applenetbd.com.prod.hosts.ooklaserver.net:8080"
+    },
+    {
+      "id": "64706",
+      "name": "Dhaka",
+      "url": "http://st.mimebd.com:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "MiME Broadband",
+      "host": "st.mimebd.com.prod.hosts.ooklaserver.net:8080"
+    },
+    {
       "id": "71584",
       "name": "Dhaka",
       "url": "http://speedtest.ftp.com.bd:8080/speedtest/upload.php",
       "country": "Bangladesh",
       "sponsor": "Fastway BD",
       "host": "speedtest.ftp.com.bd.prod.hosts.ooklaserver.net:8080"
-    },
-    {
-      "id": "69390",
-      "name": "Dhaka",
-      "url": "http://speedtest.signature-bd.com:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Signature International",
-      "host": "speedtest.signature-bd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "13751",
@@ -354,20 +354,20 @@
       "host": "speedtest.dreamnetbd.com.prod.hosts.ooklaserver.net:8080"
     },
     {
+      "id": "69390",
+      "name": "Dhaka",
+      "url": "http://speedtest.signature-bd.com:8080/speedtest/upload.php",
+      "country": "Bangladesh",
+      "sponsor": "Signature International",
+      "host": "speedtest.signature-bd.com.prod.hosts.ooklaserver.net:8080"
+    },
+    {
       "id": "33296",
       "name": "Dhaka",
       "url": "http://speedtest.pipexbd.com:8080/speedtest/upload.php",
       "country": "Bangladesh",
       "sponsor": "Pipex Network",
       "host": "speedtest.pipexbd.com.prod.hosts.ooklaserver.net:8080"
-    },
-    {
-      "id": "70859",
-      "name": "Dhaka",
-      "url": "http://ookla.skyviewonline.com:8080/speedtest/upload.php",
-      "country": "Bangladesh",
-      "sponsor": "Skyview Online Ltd",
-      "host": "ookla.skyviewonline.com.prod.hosts.ooklaserver.net:8080"
     },
     {
       "id": "71248",

@@ -79,10 +79,13 @@ func RunTUI() error {
 	grid.AddItem(jitterBox, 4, 3, 1, 1, 0, 0, false)
 
 	footer := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true).
-		SetText("[white]Press [yellow]C [white]Copy Results | [yellow]R [white]Restart | [yellow]H [white]History | [red]Esc [white]Close Popups | [red]Ctrl+C [white]Exit")
+		SetText("[white]Press [yellow]? [white]Help | [yellow]C [white]Copy | [yellow]R [white]Restart | [yellow]H [white]History | [red]Esc [white]Close | [red]Ctrl+C [white]Exit")
 	grid.AddItem(footer, 5, 0, 1, 4, 0, 0, false)
 
 	pages.AddPage("main", grid, true, true)
+
+	// Add help modal
+	showHelp()
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
@@ -91,9 +94,20 @@ func RunTUI() error {
 			return nil
 		case tcell.KeyEscape:
 			pages.RemovePage("history")
+			pages.RemovePage("help")
 			return event
+		case tcell.KeyF1:
+			showHelp()
+			return nil
 		}
 		switch event.Rune() {
+		case '?':
+			if pages.HasPage("help") {
+				pages.RemovePage("help")
+			} else {
+				showHelp()
+			}
+			return nil
 		case 'c', 'C':
 			summary := fmt.Sprintf("AuraSpeed Results - Down: %s Mbps, Up: %s Mbps",
 				downloadBox.GetText(true), uploadBox.GetText(true))
@@ -296,4 +310,36 @@ func updateStatus(msg string) {
 	app.QueueUpdateDraw(func() {
 		status.SetText(msg)
 	})
+}
+
+func showHelp() {
+	helpText := `[yellow]AuraSpeed Keyboard Shortcuts[white]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[cyan]General[white]
+  [yellow]?[white] or [yellow]F1[white]   Toggle this help
+  [yellow]Ctrl+C[white]   Exit application
+
+[cyan]Speed Test[white]
+  [yellow]R[white]         Restart speed test
+  [yellow]Esc[white]        Close popups/Cancel
+
+[cyan]Results[white]
+  [yellow]C[white]         Copy results to clipboard
+  [yellow]H[white]         View test history
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[gray]Results are automatically saved to history
+      if savehistory is enabled in config[white]`
+
+	helpView := tview.NewTextView().
+		SetDynamicColors(true).
+		SetTextAlign(tview.AlignCenter).
+		SetText(helpText)
+	helpView.SetBorder(true).SetTitle(" HELP ").SetBorderColor(tcell.ColorTeal)
+
+	modal := tview.NewGrid().SetColumns(0, 60, 0).SetRows(0, 14, 0).
+		AddItem(helpView, 1, 1, 1, 1, 0, 0, true)
+
+	pages.AddPage("help", modal, true, true)
 }

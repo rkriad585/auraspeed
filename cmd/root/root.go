@@ -3,6 +3,7 @@ package root
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"auraspeed/internal/config"
@@ -58,7 +59,76 @@ Use 'auraspeed [command] --help' for more information about a command.`,
 	},
 }
 
+// selfUninstall removes the current binary and its configuration
+func selfUninstall() error {
+	// Get the current executable path
+	execPath, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("failed to get executable path: %w", err)
+	}
+
+	fmt.Println("Uninstalling AuraSpeed...")
+
+	// Get home directory
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	// Try to remove from PATH location
+	pathDirs := filepath.SplitList(os.Getenv("PATH"))
+	for _, dir := range pathDirs {
+		possiblePath := filepath.Join(dir, "auraspeed")
+		if runtime.GOOS == "windows" {
+			possiblePath += ".exe"
+		}
+		if _, err := os.Stat(possiblePath); err == nil {
+			os.Remove(possiblePath)
+			fmt.Printf("Removed from PATH: %s\n", possiblePath)
+		}
+	}
+
+	// Try to remove from config bin directory
+	configBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed", "bin")
+	binPath := filepath.Join(configBinDir, "auraspeed")
+	if runtime.GOOS == "windows" {
+		binPath += ".exe"
+	}
+	if _, err := os.Stat(configBinDir); err == nil {
+		os.Remove(binPath)
+		fmt.Printf("Removed from config bin: %s\n", binPath)
+	}
+
+	// Ask user to remove configuration
+	fmt.Println("")
+	fmt.Println("Do you want to remove configuration files? (y/N)")
+	var response string
+	fmt.Scanln(&response)
+	if response == "y" || response == "Y" {
+		configDir := filepath.Join(homeDir, ".auraspeed")
+		os.RemoveAll(configDir)
+		fmt.Printf("Removed configuration: %s\n", configDir)
+	}
+
+	// Remove the current executable
+	os.Remove(execPath)
+	fmt.Printf("Removed executable: %s\n", execPath)
+
+	fmt.Println("")
+	fmt.Println("AuraSpeed has been uninstalled successfully!")
+	fmt.Println("Please restart your shell to complete the uninstallation.")
+
+	return nil
+}
+
 func Execute() error {
+	// Check for self-uninstall flag first
+	for _, arg := range os.Args {
+		if arg == "--selfuninstall" || arg == "--uninstall" {
+			return selfUninstall()
+		}
+	}
+
 	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
 		fmt.Printf("AuraSpeed %s\n", Version)
 		fmt.Printf("Commit: %s\n", Commit)
@@ -75,6 +145,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("no-color", "", false, "Disable colored output")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose logging")
 	rootCmd.PersistentFlags().BoolP("version", "", false, "Show version information")
+	rootCmd.PersistentFlags().Bool("selfuninstall", false, "Uninstall AuraSpeed from the system")
 
 	rootCmd.AddCommand(ui.NewTUICommand())
 	rootCmd.AddCommand(NewSpeedtestCommand())
@@ -84,4 +155,7 @@ func init() {
 	rootCmd.AddCommand(NewConfigCommand())
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(NewWebCommand())
+	rootCmd.AddCommand(NewUpdateCommand())
+	rootCmd.AddCommand(NewServersCommand())
+	rootCmd.AddCommand(NewInstallCommand())
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"auraspeed/internal/config"
@@ -12,8 +13,13 @@ import (
 	st "github.com/showwin/speedtest-go/speedtest"
 )
 
-// cacheDuration is how long the server cache remains valid.
-const cacheDuration = 1 * time.Hour
+// defaultCacheDuration is the default time the server cache remains valid.
+const defaultCacheDuration = 1 * time.Hour
+
+// CacheTTL is the configurable cache TTL in seconds
+var CacheTTL = 3600 // default 1 hour
+
+var cacheMutex sync.RWMutex
 
 // CachedServer represents a speed test server stored in cache.
 type CachedServer struct {
@@ -78,12 +84,15 @@ func saveServerCache(servers st.Servers) error {
 	}
 
 	cacheFile := getCacheFilePath()
-	return os.WriteFile(cacheFile, data, 0600)
+	return os.WriteFile(cacheFile, data, 0644)
 }
 
 // isCacheValid checks if the cache is still within its validity period.
 func isCacheValid(cache *ServerCache) bool {
-	return time.Since(cache.Timestamp) < cacheDuration
+	cacheMutex.RLock()
+	ttl := time.Duration(CacheTTL) * time.Second
+	cacheMutex.RUnlock()
+	return time.Since(cache.Timestamp) < ttl
 }
 
 // convertToSpeedtestServers converts cached servers back to speedtest-go format.

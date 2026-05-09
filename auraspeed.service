@@ -1,0 +1,37 @@
+[Unit]
+Description=AuraSpeed - Network Diagnostics Tool
+Documentation=https://github.com/rkriad585/auraspeed
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%u
+Group=%g
+WorkingDirectory=/opt/auraspeed
+
+# Web server mode
+ExecStart=/opt/auraspeed/auraspeed web -p 8080
+
+# Restart on failure, with 5 second delay between retries
+Restart=on-failure
+RestartSec=5
+
+# Environment options
+Environment=AURASPEED_AUTOUPDATE=false
+Environment=AURASPEED_LOGLEVEL=info
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/auraspeed
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=auraspeed
+
+[Install]
+WantedBy=multi-user.target

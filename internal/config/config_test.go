@@ -1,8 +1,10 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestGetDefaultConfig(t *testing.T) {
@@ -65,5 +67,72 @@ func TestGetHistoryFile(t *testing.T) {
 	}
 	if filepath.Ext(file) != ".json" {
 		t.Errorf("expected .json extension, got %s", filepath.Ext(file))
+	}
+}
+
+func TestConfigAliases(t *testing.T) {
+	cfg := GetDefaultConfig()
+
+	if cfg.Aliases["st"] != "speedtest" {
+		t.Errorf("expected alias 'st' -> 'speedtest', got '%s'", cfg.Aliases["st"])
+	}
+	if cfg.Aliases["si"] != "info" {
+		t.Errorf("expected alias 'si' -> 'info', got '%s'", cfg.Aliases["si"])
+	}
+	if cfg.Aliases["net"] != "network" {
+		t.Errorf("expected alias 'net' -> 'network', got '%s'", cfg.Aliases["net"])
+	}
+	if cfg.Aliases["hist"] != "history" {
+		t.Errorf("expected alias 'hist' -> 'history', got '%s'", cfg.Aliases["hist"])
+	}
+}
+
+func TestSpeedtestConfig(t *testing.T) {
+	cfg := GetDefaultConfig()
+
+	if cfg.Speedtest.DefaultServerID != 0 {
+		t.Errorf("expected defaultserverid 0, got %d", cfg.Speedtest.DefaultServerID)
+	}
+	if cfg.Speedtest.ParallelDownloads != 4 {
+		t.Errorf("expected paralleldownloads 4, got %d", cfg.Speedtest.ParallelDownloads)
+	}
+	if cfg.Speedtest.ParallelUploads != 2 {
+		t.Errorf("expected paralleluploads 2, got %d", cfg.Speedtest.ParallelUploads)
+	}
+}
+
+func TestUIConfig(t *testing.T) {
+	cfg := GetDefaultConfig()
+
+	if cfg.UI.Theme != "default" {
+		t.Errorf("expected theme 'default', got '%s'", cfg.UI.Theme)
+	}
+	if cfg.UI.GraphHeight != 8 {
+		t.Errorf("expected graphheight 8, got %d", cfg.UI.GraphHeight)
+	}
+	if cfg.UI.AutoRefresh != false {
+		t.Errorf("expected autorefresh false, got %v", cfg.UI.AutoRefresh)
+	}
+	if cfg.UI.RefreshRate != 5 {
+		t.Errorf("expected refreshrate 5, got %d", cfg.UI.RefreshRate)
+	}
+}
+
+func TestConfigDirCreation(t *testing.T) {
+	testAppName := "auraspeed-test-" + time.Now().Format("20060102150405")
+
+	err := Init(testAppName)
+	if err != nil {
+		t.Fatalf("failed to init config: %v", err)
+	}
+
+	dir := GetConfigDir()
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		t.Errorf("config directory was not created: %s", dir)
+	}
+
+	dataDir := GetDataDir()
+	if _, err := os.Stat(dataDir); os.IsNotExist(err) {
+		t.Errorf("data directory was not created: %s", dataDir)
 	}
 }

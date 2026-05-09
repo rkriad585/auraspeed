@@ -83,6 +83,22 @@ func Init(appName string) error {
 		}
 	}
 
+	// Set up environment variable support with AS_ prefix
+	viper.SetEnvPrefix("AS")
+	viper.AutomaticEnv()
+	viper.BindEnv("loglevel")
+	viper.BindEnv("nocolor")
+	viper.BindEnv("autoupdate")
+	viper.BindEnv("speedtest_timeout")
+	viper.BindEnv("speedtest_defaultserverid")
+	viper.BindEnv("ui_savehistory")
+	viper.BindEnv("ui_historylimit")
+
+	// Allow config file path to be overridden via env var
+	if customPath := os.Getenv("AS_CONFIG_PATH"); customPath != "" {
+		configFile = customPath
+	}
+
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(configFile)
 	viper.SetDefault("global.loglevel", "info")
@@ -117,6 +133,46 @@ func Init(appName string) error {
 
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return fmt.Errorf("failed to unmarshal config: %w", err)
+	}
+
+	// Validate configuration
+	if err := cfg.Validate(); err != nil {
+		return fmt.Errorf("invalid configuration: %w", err)
+	}
+
+	return nil
+}
+
+// Validate checks if the configuration values are valid.
+func (c *Config) Validate() error {
+	// Validate log level
+	validLogLevels := map[string]bool{"debug": true, "info": true, "warn": true, "error": true}
+	if !validLogLevels[c.Global.LogLevel] {
+		return fmt.Errorf("invalid log level '%s', must be one of: debug, info, warn, error", c.Global.LogLevel)
+	}
+
+	// Validate timeout
+	if c.Speedtest.Timeout < 10 || c.Speedtest.Timeout > 300 {
+		return fmt.Errorf("invalid timeout '%d', must be between 10 and 300 seconds", c.Speedtest.Timeout)
+	}
+
+	// Validate parallel connections
+	if c.Speedtest.ParallelDownloads < 1 || c.Speedtest.ParallelDownloads > 16 {
+		return fmt.Errorf("invalid parallel downloads '%d', must be between 1 and 16", c.Speedtest.ParallelDownloads)
+	}
+	if c.Speedtest.ParallelUploads < 1 || c.Speedtest.ParallelUploads > 16 {
+		return fmt.Errorf("invalid parallel uploads '%d', must be between 1 and 16", c.Speedtest.ParallelUploads)
+	}
+
+	// Validate UI settings
+	if c.UI.GraphHeight < 3 || c.UI.GraphHeight > 20 {
+		return fmt.Errorf("invalid graph height '%d', must be between 3 and 20", c.UI.GraphHeight)
+	}
+	if c.UI.HistoryLimit < 10 || c.UI.HistoryLimit > 1000 {
+		return fmt.Errorf("invalid history limit '%d', must be between 10 and 1000", c.UI.HistoryLimit)
+	}
+	if c.UI.RefreshRate < 1 || c.UI.RefreshRate > 60 {
+		return fmt.Errorf("invalid refresh rate '%d', must be between 1 and 60 seconds", c.UI.RefreshRate)
 	}
 
 	return nil
@@ -198,14 +254,15 @@ func ensureFilePermissions(path string, perm os.FileMode) error {
 	return nil
 }
 
-// EnsureSensitiveFilePermissions ensures all sensitive files have restricted permissions (0600).
+// EnsureSensitiveFilePermissions ensures config files have restricted permissions (0600).
+// History file uses 0644 so users can read their test history.
 func EnsureSensitiveFilePermissions() error {
 	files := []struct {
 		path string
 		perm os.FileMode
 	}{
 		{GetConfigFile(), 0600},
-		{GetHistoryFile(), 0600},
+		{GetHistoryFile(), 0644},
 		{filepath.Join(GetDataDir(), "servers.json"), 0600},
 	}
 
