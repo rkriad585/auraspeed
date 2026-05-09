@@ -75,6 +75,21 @@ func selfUninstall() error {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
 
+	removed := false
+
+	// Try to remove from config bin directory first
+	configBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed", "bin")
+	binPath := filepath.Join(configBinDir, "auraspeed")
+	if runtime.GOOS == "windows" {
+		binPath += ".exe"
+	}
+	if _, err := os.Stat(binPath); err == nil {
+		if err := os.Remove(binPath); err == nil {
+			fmt.Printf("Removed from config: %s\n", binPath)
+			removed = true
+		}
+	}
+
 	// Try to remove from PATH location
 	pathDirs := filepath.SplitList(os.Getenv("PATH"))
 	for _, dir := range pathDirs {
@@ -83,40 +98,37 @@ func selfUninstall() error {
 			possiblePath += ".exe"
 		}
 		if _, err := os.Stat(possiblePath); err == nil {
-			os.Remove(possiblePath)
-			fmt.Printf("Removed from PATH: %s\n", possiblePath)
+			if err := os.Remove(possiblePath); err == nil {
+				fmt.Printf("Removed from PATH: %s\n", possiblePath)
+				removed = true
+			}
 		}
 	}
 
-	// Try to remove from config bin directory
-	configBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed", "bin")
-	binPath := filepath.Join(configBinDir, "auraspeed")
-	if runtime.GOOS == "windows" {
-		binPath += ".exe"
-	}
-	if _, err := os.Stat(configBinDir); err == nil {
-		os.Remove(binPath)
-		fmt.Printf("Removed from config bin: %s\n", binPath)
-	}
-
-	// Ask user to remove configuration
-	fmt.Println("")
-	fmt.Println("Do you want to remove configuration files? (y/N)")
-	var response string
-	fmt.Scanln(&response)
-	if response == "y" || response == "Y" {
-		configDir := filepath.Join(homeDir, ".auraspeed")
+	// Remove configuration directory
+	configDir := filepath.Join(homeDir, ".auraspeed")
+	if _, err := os.Stat(configDir); err == nil {
 		os.RemoveAll(configDir)
 		fmt.Printf("Removed configuration: %s\n", configDir)
 	}
 
-	// Remove the current executable
-	os.Remove(execPath)
-	fmt.Printf("Removed executable: %s\n", execPath)
+	// Remove the current executable if it's different from config bin
+	if _, err := os.Stat(execPath); err == nil {
+		// Only remove if not already removed (in case execPath is same as binPath)
+		if execPath != binPath {
+			if err := os.Remove(execPath); err == nil {
+				fmt.Printf("Removed executable: %s\n", execPath)
+				removed = true
+			}
+		}
+	}
+
+	if !removed {
+		fmt.Println("No AuraSpeed installation found in expected locations.")
+	}
 
 	fmt.Println("")
 	fmt.Println("AuraSpeed has been uninstalled successfully!")
-	fmt.Println("Please restart your shell to complete the uninstallation.")
 
 	return nil
 }
