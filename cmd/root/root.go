@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"auraspeed/internal/config"
 	"auraspeed/internal/logging"
@@ -69,32 +70,8 @@ func selfUninstall() error {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	// Define possible binary locations
-	locations := []string{
-		filepath.Join(homeDir, ".config", "neostore", "auraspeed", "bin", "auraspeed"),
-		filepath.Join(homeDir, ".local", "bin", "auraspeed"),
-		filepath.Join(homeDir, "bin", "auraspeed"),
-		"/usr/local/bin/auraspeed",
-		"/usr/bin/auraspeed",
-	}
-
-	if runtime.GOOS == "windows" {
-		for i := range locations {
-			locations[i] += ".exe"
-		}
-	}
-
-	removedAny := false
-
-	// Remove binaries
-	for _, loc := range locations {
-		if _, err := os.Stat(loc); err == nil {
-			if err := os.Remove(loc); err == nil {
-				fmt.Printf("Removed binary: %s\n", loc)
-				removedAny = true
-			}
-		}
-	}
+	// Get current executable path
+	execPath, _ := os.Executable()
 
 	// Remove configuration directory (~/.auraspeed)
 	configDir := filepath.Join(homeDir, ".auraspeed")
@@ -106,28 +83,31 @@ func selfUninstall() error {
 	// Remove auraspeed app directory (~/.config/neostore/auraspeed)
 	auraspeedBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed")
 	if _, err := os.Stat(auraspeedBinDir); err == nil {
-		// Remove all files in bin directory first
+		// First try to remove files in bin directory
 		binPath := filepath.Join(auraspeedBinDir, "bin")
 		if _, err := os.Stat(binPath); err == nil {
 			entries, _ := os.ReadDir(binPath)
 			for _, entry := range entries {
 				filePath := filepath.Join(binPath, entry.Name())
-				os.Remove(filePath)
+				os.Remove(filePath) // Ignore errors - file might be locked
 			}
-			os.Remove(binPath)
+			os.Remove(binPath) // Ignore errors
 		}
-		// Remove auraspeed directory
+		// Try to remove auraspeed directory - might fail if binary is running
 		os.RemoveAll(auraspeedBinDir)
 		fmt.Printf("Removed app directory: %s\n", auraspeedBinDir)
 	}
 
-	if !removedAny {
-		fmt.Println("No AuraSpeed binary found in standard locations.")
+	// Try to remove the current executable if it's in a different location
+	if execPath != "" && !strings.Contains(execPath, ".config/neostore/auraspeed") {
+		if _, err := os.Stat(execPath); err == nil {
+			os.Remove(execPath)
+			fmt.Printf("Removed binary: %s\n", execPath)
+		}
 	}
 
 	fmt.Println("")
 	fmt.Println("AuraSpeed has been uninstalled successfully!")
-	fmt.Println("Note: If the binary was running, it may not have been removed.")
 
 	return nil
 }
