@@ -2,8 +2,8 @@ package root
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -14,24 +14,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// updateCheckResult represents the response from GitHub releases API
-type updateCheckResult struct {
-	TagName string `json:"tag_name"`
-}
-
-// checkForUpdate checks GitHub for the latest release version
+// checkForUpdate fetches the latest version from the GitHub .version file
 func checkForUpdate() (string, error) {
-	const (
-		owner = "rkriad585"
-		repo  = "auraspeed"
-	)
-
-	apiURL := fmt.Sprintf("https://api.github.com/repos/%s/%s/releases/latest", owner, repo)
+	versionURL := "https://raw.githubusercontent.com/rkriad585/auraspeed/main/.version"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, versionURL, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
@@ -49,12 +39,17 @@ func checkForUpdate() (string, error) {
 		return "", fmt.Errorf("update check returned status %d", resp.StatusCode)
 	}
 
-	var result updateCheckResult
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", fmt.Errorf("failed to parse response: %w", err)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response: %w", err)
 	}
 
-	return result.TagName, nil
+	version := strings.TrimSpace(string(body))
+	if version == "" {
+		return "", fmt.Errorf("empty version from .version file")
+	}
+
+	return version, nil
 }
 
 // compareVersions compares two version strings (v1.0.0 format)
@@ -99,17 +94,16 @@ func NewUpdateCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update",
-		Short: "Check for updates",
-		Long:  "Check if a newer version of AuraSpeed is available.",
+		Short: "Update AuraSpeed to the latest version",
+		Long:  "Check for and install the latest version of AuraSpeed.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentVersion := Version
 			if currentVersion == "dev" {
-				fmt.Println("Running from source - cannot check for updates.")
-				fmt.Println("To check for updates, use a released binary.")
+				fmt.Println("Running from source - cannot update.")
 				return nil
 			}
 
-			fmt.Println("Checking for updates...")
+			fmt.Println(">>> Checking for updates...")
 
 			latestVersion, err := checkForUpdate()
 			if err != nil {
@@ -120,12 +114,16 @@ func NewUpdateCommand() *cobra.Command {
 			switch comparison {
 			case -1:
 				fmt.Printf("Update available: %s -> %s\n", currentVersion, latestVersion)
-				fmt.Println("Download from: https://github.com/rkriad585/auraspeed/releases")
-				if !checkOnly {
-					fmt.Println("\nTo update, download the new release and replace your binary.")
+				if checkOnly {
+					fmt.Printf("Run 'auraspeed update' to install the latest version.\n")
+				} else {
+					result := selfInstall(latestVersion)
+					if result != 0 {
+						return fmt.Errorf("update installation failed")
+					}
 				}
 			case 0:
-				fmt.Printf("You are running the latest version: %s\n", currentVersion)
+				fmt.Printf("OK   You are running the latest version: %s\n", currentVersion)
 			case 1:
 				fmt.Printf("You are running a newer version (%s) than latest release (%s)\n", currentVersion, latestVersion)
 			}
@@ -134,7 +132,7 @@ func NewUpdateCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVar(&checkOnly, "check", false, "Only check for updates, don't display instructions")
+	cmd.Flags().BoolVar(&checkOnly, "check", false, "Only check for updates, don't install")
 
 	return cmd
 }
