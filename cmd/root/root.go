@@ -2,12 +2,10 @@ package root
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	"auraspeed/internal/config"
 	"auraspeed/internal/logging"
@@ -76,136 +74,78 @@ func installDir() string {
 	return dir
 }
 
-func selfInstall(version string) int {
-	targetDir := installDir()
-	binName := "auraspeed"
+func ConfigDir() string {
+	return filepath.Join(homeDir(), ".config", "neostore", "auraspeed")
+}
+
+func selfUninstall() int {
+	configDir := ConfigDir()
+
+	fmt.Println(">>> Uninstalling AuraSpeed...")
+
+	if _, err := os.Stat(configDir); err == nil {
+		if err := os.RemoveAll(configDir); err != nil {
+			fmt.Fprintf(os.Stderr, "Error removing config directory: %v\n", err)
+			return 1
+		}
+		fmt.Println("OK   Removed config directory:", configDir)
+	} else {
+		fmt.Println("OK   No config directory found.")
+	}
+
+	exePath, err := os.Executable()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error resolving binary path: %v\n", err)
+		return 1
+	}
+
+	realPath, err := filepath.EvalSymlinks(exePath)
+	if err == nil {
+		exePath = realPath
+	}
+
 	if runtime.GOOS == "windows" {
-		binName = "auraspeed.exe"
-	}
-	targetPath := filepath.Join(targetDir, binName)
-
-	fmt.Printf(">>> Installing AuraSpeed %s...\n", version)
-
-	repo := "rkriad585/auraspeed"
-	var downloadName string
-
-	switch runtime.GOOS {
-	case "windows":
-		downloadName = "auraspeed-windows-amd64.exe"
-	case "darwin":
-		switch runtime.GOARCH {
-		case "arm64":
-			downloadName = "auraspeed-darwin-arm64"
-		default:
-			downloadName = "auraspeed-darwin-amd64"
+		batContent := fmt.Sprintf("@echo off\r\ntimeout /t 1 /nobreak >nul\r\ndel /f /q \"%s\"\r\nif exist \"%s\" (echo ERR Failed to delete binary) else (echo OK   Deleted binary: %s)\r\ndel /f /q \"%%~f0\"\r\n", exePath, exePath, exePath)
+		batPath := filepath.Join(os.TempDir(), "auraspeed-uninstall.bat")
+		if err := os.WriteFile(batPath, []byte(batContent), 0644); err != nil {
+			fmt.Fprintf(os.Stderr, "Error creating uninstall script: %v\n", err)
+			fmt.Println("Please manually delete:", exePath)
+			return 1
 		}
-	case "linux":
-		switch runtime.GOARCH {
-		case "arm64":
-			downloadName = "auraspeed-linux-arm64"
-		default:
-			downloadName = "auraspeed-linux-amd64"
+		fmt.Println("OK   Uninstall script created. Binary will be deleted shortly.")
+		cmd := exec.Command("cmd", "/C", "start", "/B", batPath)
+		cmd.Stderr = os.Stderr
+		cmd.Start()
+	} else {
+		if err := os.Remove(exePath); err != nil {
+			fmt.Fprintf(os.Stderr, "Error deleting binary: %v\n", err)
+			fmt.Println("Please manually delete:", exePath)
+			return 1
 		}
-	default:
-		fmt.Fprintf(os.Stderr, "Unsupported platform: %s/%s\n", runtime.GOOS, runtime.GOARCH)
-		return 1
+		fmt.Println("OK   Deleted binary:", exePath)
 	}
 
-	url := fmt.Sprintf("https://github.com/%s/releases/download/%s/%s", repo, version, downloadName)
+	fmt.Println()
+	fmt.Println("To remove AuraSpeed from your PATH, edit your shell rc file")
+	fmt.Println("and delete the line containing 'neostore/auraspeed/bin'.")
 
-	fmt.Printf(">>> Downloading %s\n", url)
-
-	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Get(url)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
-		fmt.Println("Falling back to copying the current binary...")
-		return copySelf(targetPath)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		fmt.Fprintf(os.Stderr, "Download failed: HTTP %d\n", resp.StatusCode)
-		fmt.Println("Falling back to copying the current binary...")
-		return copySelf(targetPath)
+	if runtime.GOOS == "windows" {
+		fmt.Println("Or run: install.ps1 --selfuninstall")
+	} else {
+		fmt.Println("Or run: install.sh --selfuninstall")
 	}
 
-	out, err := os.Create(targetPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating file: %v\n", err)
-		return 1
-	}
-	defer out.Close()
-
-	written, err := io.Copy(out, resp.Body)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error writing file: %v\n", err)
-		out.Close()
-		os.Remove(targetPath)
-		return 1
-	}
-	out.Close()
-
-	if written == 0 {
-		fmt.Fprintln(os.Stderr, "Downloaded empty file")
-		os.Remove(targetPath)
-		fmt.Println("Falling back to copying the current binary...")
-		return copySelf(targetPath)
-	}
-
-	if runtime.GOOS != "windows" {
-		os.Chmod(targetPath, 0755)
-	}
-
-	fmt.Printf("OK   Installed to %s (%d bytes)\n", targetPath, written)
-
-	return addToPath(targetDir)
-}
-
-func copySelf(targetPath string) int {
-	src, err := os.Executable()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error getting executable path: %v\n", err)
-		return 1
-	}
-
-	in, err := os.Open(src)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening source: %v\n", err)
-		return 1
-	}
-	defer in.Close()
-
-	out, err := os.Create(targetPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating destination: %v\n", err)
-		return 1
-	}
-	defer out.Close()
-
-	written, err := io.Copy(out, in)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error copying file: %v\n", err)
-		out.Close()
-		os.Remove(targetPath)
-		return 1
-	}
-	out.Close()
-
-	if runtime.GOOS != "windows" {
-		os.Chmod(targetPath, 0755)
-	}
-
-	fmt.Printf("OK   Installed to %s (%d bytes)\n", targetPath, written)
-	return 0
-}
-
-func addToPath(targetDir string) int {
-	fmt.Printf("Add %s to your PATH to use the 'auraspeed' command\n", targetDir)
+	fmt.Println("Restart your terminal for PATH changes to take effect.")
 	return 0
 }
 
 func Execute() error {
+	for _, arg := range os.Args {
+		if arg == "--selfuninstall" || arg == "--uninstall" {
+			os.Exit(selfUninstall())
+		}
+	}
+
 	if len(os.Args) > 1 && (os.Args[1] == "--version" || os.Args[1] == "-v") {
 		fmt.Printf("AuraSpeed %s\n", Version)
 		fmt.Printf("Commit: %s\n", Commit)
@@ -222,6 +162,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("no-color", "", false, "Disable colored output")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose logging")
 	rootCmd.PersistentFlags().BoolP("version", "", false, "Show version information")
+	rootCmd.PersistentFlags().Bool("selfuninstall", false, "Uninstall AuraSpeed from the system")
 
 	rootCmd.AddCommand(ui.NewTUICommand())
 	rootCmd.AddCommand(NewSpeedtestCommand())

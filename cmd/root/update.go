@@ -90,16 +90,14 @@ func compareVersions(v1, v2 string) int {
 
 // NewUpdateCommand returns the update subcommand
 func NewUpdateCommand() *cobra.Command {
-	var checkOnly bool
-
 	cmd := &cobra.Command{
 		Use:   "update",
-		Short: "Update AuraSpeed to the latest version",
-		Long:  "Check for and install the latest version of AuraSpeed.",
+		Short: "Check for updates",
+		Long:  "Check if a newer version of AuraSpeed is available.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentVersion := Version
 			if currentVersion == "dev" {
-				fmt.Println("Running from source - cannot update.")
+				fmt.Println("Running from source - cannot check for updates.")
 				return nil
 			}
 
@@ -114,14 +112,8 @@ func NewUpdateCommand() *cobra.Command {
 			switch comparison {
 			case -1:
 				fmt.Printf("Update available: %s -> %s\n", currentVersion, latestVersion)
-				if checkOnly {
-					fmt.Printf("Run 'auraspeed update' to install the latest version.\n")
-				} else {
-					result := selfInstall(latestVersion)
-					if result != 0 {
-						return fmt.Errorf("update installation failed")
-					}
-				}
+				fmt.Println("Download from: https://github.com/rkriad585/auraspeed/releases")
+				fmt.Println("Or run the installer script to update.")
 			case 0:
 				fmt.Printf("OK   You are running the latest version: %s\n", currentVersion)
 			case 1:
@@ -131,8 +123,6 @@ func NewUpdateCommand() *cobra.Command {
 			return nil
 		},
 	}
-
-	cmd.Flags().BoolVar(&checkOnly, "check", false, "Only check for updates, don't install")
 
 	return cmd
 }
