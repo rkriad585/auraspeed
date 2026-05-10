@@ -59,8 +59,7 @@ Use 'auraspeed [command] --help' for more information about a command.`,
 	},
 }
 
-// getHomeDir returns the user's home directory
-func getHomeDir() string {
+func homeDir() string {
 	if runtime.GOOS == "windows" {
 		return os.Getenv("USERPROFILE")
 	}
@@ -68,55 +67,50 @@ func getHomeDir() string {
 	return h
 }
 
-// getInstallDir returns the installation directory for AuraSpeed
-func getInstallDir() string {
-	dir := filepath.Join(getHomeDir(), ".config", "neostore", "auraspeed", "bin")
+func installDir() string {
+	dir := filepath.Join(homeDir(), ".config", "neostore", "auraspeed", "bin")
 	os.MkdirAll(dir, 0755)
 	return dir
 }
 
-// selfUninstall removes the current binary and its configuration
 func selfUninstall() error {
-	fmt.Println("Uninstalling AuraSpeed...")
+	fmt.Println(">>> Uninstalling AuraSpeed...")
 
-	// Get install directory
-	installDir := getInstallDir()
-
-	// Binary name
+	binDir := installDir()
 	binName := "auraspeed"
 	if runtime.GOOS == "windows" {
 		binName = "auraspeed.exe"
 	}
+	binPath := filepath.Join(binDir, binName)
 
-	// Remove binary from install directory
-	binPath := filepath.Join(installDir, binName)
 	if _, err := os.Stat(binPath); err == nil {
-		os.Remove(binPath)
-		fmt.Printf("Removed binary: %s\n", binPath)
+		if err := os.Remove(binPath); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: could not remove binary: %v\n", err)
+		} else {
+			fmt.Printf("Removed  %s\n", binPath)
+		}
 	}
 
-	// Remove empty bin directory
-	binDir := filepath.Join(filepath.Dir(binPath))
-	if _, err := os.Stat(binDir); err == nil {
-		os.Remove(binDir)
-	}
-
-	// Remove auraspeed directory
-	auraspeedDir := filepath.Join(getHomeDir(), ".config", "neostore", "auraspeed")
+	auraspeedDir := filepath.Join(homeDir(), ".config", "neostore", "auraspeed")
 	if _, err := os.Stat(auraspeedDir); err == nil {
-		os.RemoveAll(auraspeedDir)
-		fmt.Printf("Removed app directory: %s\n", auraspeedDir)
+		if err := os.RemoveAll(auraspeedDir); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: could not remove app directory: %v\n", err)
+		} else {
+			fmt.Printf("Removed  %s\n", auraspeedDir)
+		}
 	}
 
-	// Remove configuration directory (~/.auraspeed)
-	configDir := filepath.Join(getHomeDir(), ".auraspeed")
+	configDir := filepath.Join(homeDir(), ".auraspeed")
 	if _, err := os.Stat(configDir); err == nil {
-		os.RemoveAll(configDir)
-		fmt.Printf("Removed configuration: %s\n", configDir)
+		if err := os.RemoveAll(configDir); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: could not remove configuration: %v\n", err)
+		} else {
+			fmt.Printf("Removed  %s\n", configDir)
+		}
 	}
 
-	fmt.Println("")
-	fmt.Println("AuraSpeed has been uninstalled successfully!")
+	fmt.Println()
+	fmt.Println("OK   AuraSpeed has been uninstalled successfully!")
 
 	return nil
 }
