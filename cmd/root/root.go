@@ -69,7 +69,7 @@ func selfUninstall() error {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	// Define possible install locations
+	// Define possible binary locations
 	locations := []string{
 		filepath.Join(homeDir, ".config", "neostore", "auraspeed", "bin", "auraspeed"),
 		filepath.Join(homeDir, ".local", "bin", "auraspeed"),
@@ -79,7 +79,6 @@ func selfUninstall() error {
 	}
 
 	if runtime.GOOS == "windows" {
-		// Add .exe versions for Windows
 		for i := range locations {
 			locations[i] += ".exe"
 		}
@@ -87,28 +86,48 @@ func selfUninstall() error {
 
 	removedAny := false
 
-	// Try to remove from all known locations
+	// Remove binaries
 	for _, loc := range locations {
 		if _, err := os.Stat(loc); err == nil {
 			if err := os.Remove(loc); err == nil {
-				fmt.Printf("Removed: %s\n", loc)
+				fmt.Printf("Removed binary: %s\n", loc)
 				removedAny = true
 			}
 		}
 	}
 
-	// Remove configuration directory
+	// Remove configuration directory (~/.auraspeed)
 	configDir := filepath.Join(homeDir, ".auraspeed")
 	if _, err := os.Stat(configDir); err == nil {
 		os.RemoveAll(configDir)
 		fmt.Printf("Removed configuration: %s\n", configDir)
 	}
 
-	// Remove auraspeed bin directory
+	// Remove auraspeed app directory (~/.config/neostore/auraspeed)
 	auraspeedBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed")
 	if _, err := os.Stat(auraspeedBinDir); err == nil {
+		// Try to remove the bin file first (in case it's still locked)
+		binPath := filepath.Join(auraspeedBinDir, "bin")
+		if _, err := os.Stat(binPath); err == nil {
+			// Try to remove files in bin directory
+			os.ReadDir(binPath)
+			entries, _ := os.ReadDir(binPath)
+			for _, entry := range entries {
+				filePath := filepath.Join(binPath, entry.Name())
+				os.Remove(filePath)
+			}
+			// Remove bin directory
+			os.Remove(binPath)
+		}
+		// Remove auraspeed directory
 		os.RemoveAll(auraspeedBinDir)
 		fmt.Printf("Removed app directory: %s\n", auraspeedBinDir)
+	}
+
+	// Remove empty neostore directory
+	neostoreDir := filepath.Join(homeDir, ".config", "neostore")
+	if _, err := os.Stat(neostoreDir); err == nil {
+		os.RemoveAll(neostoreDir)
 	}
 
 	if !removedAny {
@@ -117,6 +136,7 @@ func selfUninstall() error {
 
 	fmt.Println("")
 	fmt.Println("AuraSpeed has been uninstalled successfully!")
+	fmt.Println("Note: If the binary was running, it may not have been removed.")
 
 	return nil
 }
