@@ -85,10 +85,15 @@ func selfUninstall() int {
 
 	if _, err := os.Stat(configDir); err == nil {
 		if err := os.RemoveAll(configDir); err != nil {
-			fmt.Fprintf(os.Stderr, "Error removing config directory: %v\n", err)
-			return 1
+			if runtime.GOOS == "windows" {
+				fmt.Fprintf(os.Stderr, "Warning: could not remove all files (binary in use).\n")
+			} else {
+				fmt.Fprintf(os.Stderr, "Error removing config directory: %v\n", err)
+				return 1
+			}
+		} else {
+			fmt.Println("OK   Removed config directory:", configDir)
 		}
-		fmt.Println("OK   Removed config directory:", configDir)
 	} else {
 		fmt.Println("OK   No config directory found.")
 	}
@@ -129,11 +134,7 @@ func selfUninstall() int {
 	fmt.Println("To remove AuraSpeed from your PATH, edit your shell rc file")
 	fmt.Println("and delete the line containing 'neostore/auraspeed/bin'.")
 
-	if runtime.GOOS == "windows" {
-		fmt.Println("Or run: auraspeed --selfuninstall")
-	} else {
-		fmt.Println("Or run: auraspeed --selfuninstall")
-	}
+	fmt.Println("Or run: auraspeed --selfuninstall")
 
 	fmt.Println("Restart your terminal for PATH changes to take effect.")
 	return 0
