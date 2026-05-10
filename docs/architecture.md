@@ -55,7 +55,7 @@ Uses **Viper** for hierarchical configuration with TOML files.
 | `config.go` | Load/save config, defaults, validation |
 | `config_test.go` | Unit tests for config operations |
 
-**Config file location:** `~/.auraspeed/config.toml`
+**Config file location:** `~/.config/neostore/auraspeed/config.toml`
 
 ```toml
 [global]
@@ -261,7 +261,7 @@ auraspeed tui
 ```
 Defaults (code)
     ↓
-~/.auraspeed/config.toml
+~/.config/neostore/auraspeed/config.toml
     ↓
 Environment variables (AURASPEED_*)
     ↓

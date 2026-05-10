@@ -74,9 +74,9 @@ Only if building from source. Pre-built binaries don't require Go.
 
 | OS | Path |
 |----|------|
-| Windows | `%USERPROFILE%\.auraspeed\config.toml` |
-| Linux | `~/.auraspeed/config.toml` |
-| macOS | `~/.auraspeed/config.toml` |
+| Windows | `%USERPROFILE%\.config\neostore\auraspeed\config.toml` |
+| Linux | `~/.config/neostore/auraspeed/config.toml` |
+| macOS | `~/.config/neostore/auraspeed/config.toml` |
 
 ---
 
@@ -159,7 +159,7 @@ auraspeed config set speedtest.timeout 60
 ```
 
 **Via config file:**
-Edit `~/.auraspeed/config.toml` (or Windows equivalent)
+Edit `~/.config/neostore/auraspeed/config.toml` (or Windows equivalent)
 
 ---
 

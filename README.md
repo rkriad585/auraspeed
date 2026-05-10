@@ -79,7 +79,7 @@ bash build.sh
 .\build.ps1
 ```
 
-The compiled binary will be output to the project root.
+The compiled binaries will be output to the `bin/` folder.
 
 ### Pre-built Binaries
 
@@ -88,9 +88,11 @@ Download the latest pre-built binary for your platform from the [GitHub Releases
 | Platform | Binary Name |
 |----------|-------------|
 | Windows (amd64) | `auraspeed-windows-amd64.exe` |
+| Windows (arm64) | `auraspeed-windows-arm64.exe` |
 | Linux (amd64) | `auraspeed-linux-amd64` |
+| Linux (arm64) | `auraspeed-linux-arm64` |
 | macOS (Intel) | `auraspeed-darwin-amd64` |
-| macOS (Apple Silicon) | `auraspeed-darwin-arm64` | |
+| macOS (Apple Silicon) | `auraspeed-darwin-arm64` |
 
 ## Usage
 
@@ -250,8 +252,8 @@ auraspeed -v                  # Enable verbose logging
 ## Configuration
 
 AuraSpeed uses TOML for configuration via [spf13/viper](https://github.com/spf13/viper). The config file is located at:
-- Linux/macOS: `~/.auraspeed/config.toml`
-- Windows: `%USERPROFILE%\.auraspeed\config.toml`
+- Linux/macOS: `~/.config/neostore/auraspeed/config.toml`
+- Windows: `%USERPROFILE%\.config\neostore\auraspeed\config.toml`
 
 ### Default Configuration
 
@@ -306,30 +308,40 @@ AuraSpeed uses TOML for configuration via [spf13/viper](https://github.com/spf13
 
 ```
 auraspeed/
+├── bin/                  # Cross-platform build output
 ├── cmd/
 │   ├── main.go           # Entry point (package main)
-│   └── root/
-│       ├── root.go       # Root command & CLI setup (cobra)
-│       ├── commands.go   # All subcommands
-│       ├── web.go        # Web server command
-│       ├── web.html      # Web UI
-│       ├── update.go     # Update command
-│       ├── install.go    # Install command
-│       └── install.sh    # Linux/macOS installer script
+│   ├── info/
+│   ├── network/
+│   ├── root/
+│   │   ├── root.go       # Root command & CLI setup (cobra)
+│   │   ├── commands.go   # All subcommands
+│   │   ├── web.go        # Web server command
+│   │   ├── web.html      # Web UI
+│   │   ├── update.go     # Update command
+│   │   ├── install.go    # Install command
+│   │   ├── servers.json  # Speed test server list
+│   │   └── *_test.go     # Command tests
+│   └── speedtest/
+├── docs/                 # Documentation
 ├── internal/
 │   ├── config/           # Configuration management (viper)
+│   ├── http/             # HTTP client
 │   ├── info/             # System information (gopsutil)
 │   ├── logging/          # Logging utilities (zerolog)
 │   ├── network/          # Network diagnostics
 │   ├── speedtest/        # Speed test & TUI (speedtest-go, tview)
 │   └── ui/               # UI command wrapper
+├── .version              # Current version
+├── build.ps1             # PowerShell build script
+├── build.sh              # Bash/Zsh/Fish build script
+├── install.ps1           # Windows installer script
+├── install.sh            # Linux/macOS installer script
 ├── Dockerfile            # Docker container definition
 ├── docker-compose.yml    # Docker Compose configuration
 ├── auraspeed.service     # systemd service file
-├── install.ps1           # Windows installer script
-├── build.ps1             # PowerShell build script
-├── build.sh              # Bash/Zsh/Fish build script
-├── go.mod                # Go module definition (auraspeed)
+├── go.mod                # Go module definition
+├── CHANGELOG.md
 └── README.md             # This file
 ```
 

@@ -10,7 +10,7 @@ services:
       - AURASPEED_LOGLEVEL=info
       - AURASPEED_AUTOUPDATE=false
     volumes:
-      - auraspeed-config:/root/.auraspeed
+      - auraspeed-config:/root/.config/neostore/auraspeed
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]

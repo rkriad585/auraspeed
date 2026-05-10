@@ -150,9 +150,9 @@ AuraSpeed uses a TOML config file, created automatically on first run.
 ### Config File Location
 | OS | Path |
 |----|------|
-| Windows | `%USERPROFILE%\.auraspeed\config.toml` |
-| Linux | `~/.auraspeed/config.toml` |
-| macOS | `~/.auraspeed/config.toml` |
+| Windows | `%USERPROFILE%\.config\neostore\auraspeed\config.toml` |
+| Linux | `~/.config/neostore/auraspeed/config.toml` |
+| macOS | `~/.config/neostore/auraspeed/config.toml` |
 
 ### Default Config Options
 Edit the config file to customize behavior:

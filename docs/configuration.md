@@ -8,9 +8,9 @@ The configuration file is stored in TOML format:
 
 | OS | Path |
 |----|------|
-| Windows | `%USERPROFILE%\.auraspeed\config.toml` |
-| Linux | `~/.auraspeed/config.toml` |
-| macOS | `~/.auraspeed/config.toml` |
+| Windows | `%USERPROFILE%\.config\neostore\auraspeed\config.toml` |
+| Linux | `~/.config/neostore/auraspeed/config.toml` |
+| macOS | `~/.config/neostore/auraspeed/config.toml` |
 
 ---
 
@@ -225,10 +225,10 @@ If you can't write to the config file:
 
 ```powershell
 # Check permissions
-Get-Acl "$env:USERPROFILE\.auraspeed\config.toml"
+Get-Acl "$env:USERPROFILE\.config\neostore\auraspeed\config.toml"
 
 # Fix permissions
-icacls "$env:USERPROFILE\.auraspeed\config.toml" /grant "$env:USERNAME:F"
+icacls "$env:USERPROFILE\.config\neostore\auraspeed\config.toml" /grant "$env:USERNAME:F"
 ```
 
 ---

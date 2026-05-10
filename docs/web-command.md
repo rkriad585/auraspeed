@@ -162,8 +162,8 @@ The web command uses the same configuration as the CLI:
 | `speedtest.defaultserverid` | `0` | Default server (0 = auto) |
 
 Config file location:
-- Windows: `%USERPROFILE%\.auraspeed\config.toml`
-- Linux/macOS: `~/.auraspeed/config.toml`
+- Windows: `%USERPROFILE%\.config\neostore\auraspeed\config.toml`
+- Linux/macOS: `~/.config/neostore/auraspeed/config.toml`
 
 ---
 

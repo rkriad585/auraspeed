@@ -127,10 +127,10 @@ auraspeed tui
 **Fix:** AuraSpeed creates a default config on first run. If issues persist:
 ```bash
 # Windows
-notepad %USERPROFILE%\.auraspeed\config.toml
+notepad %USERPROFILE%\.config\neostore\auraspeed\config.toml
 
 # Linux/macOS
-nano ~/.auraspeed/config.toml
+nano ~/.config/neostore/auraspeed/config.toml
 ```
 
 ---
