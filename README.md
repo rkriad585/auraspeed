@@ -112,7 +112,7 @@ auraspeed web --port 3000
 - `GET /api/info` — Get system information
 - `GET /health` — Health check
 
-**Access:** http://localhost:8080
+**Access:** http://localhost:59733
 
 ---
 

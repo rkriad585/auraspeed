@@ -6,7 +6,7 @@ Complete API reference for AuraSpeed HTTP endpoints (available via `auraspeed we
 
 When running the web server:
 ```
-http://localhost:8080
+http://localhost:59733
 ```
 
 Custom port:
@@ -30,7 +30,7 @@ Check if the server is running.
 
 **Example:**
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:59733/health
 ```
 
 ---
@@ -56,7 +56,7 @@ Run a network speed test (download + upload + latency).
 
 **Example:**
 ```bash
-curl -X POST http://localhost:8080/api/speedtest
+curl -X POST http://localhost:59733/api/speedtest
 ```
 
 **Error Responses:**
@@ -95,7 +95,7 @@ Get system information (OS, CPU, memory, disk).
 
 **Example:**
 ```bash
-curl http://localhost:8080/api/info
+curl http://localhost:59733/api/info
 ```
 
 **Error Responses:**
@@ -121,11 +121,11 @@ Simple HTML interface with buttons to run tests.
 **Example:**
 ```bash
 # Open in browser
-start http://localhost:8080
+start http://localhost:59733
 # Windows
-open http://localhost:8080
+open http://localhost:59733
 # macOS
-xdg-open http://localhost:8080
+xdg-open http://localhost:59733
 # Linux
 ```
 
@@ -181,7 +181,7 @@ const axios = require('axios');
 // Speed test
 async function runSpeedTest() {
     try {
-        const response = await axios.post('http://localhost:8080/api/speedtest');
+        const response = await axios.post('http://localhost:59733/api/speedtest');
         console.log(response.data);
     } catch (error) {
         console.error('Error:', error.message);
@@ -191,7 +191,7 @@ async function runSpeedTest() {
 // System info
 async function getSystemInfo() {
     try {
-        const response = await axios.get('http://localhost:8080/api/info');
+        const response = await axios.get('http://localhost:59733/api/info');
         console.log(response.data);
     } catch (error) {
         console.error('Error:', error.message);
@@ -207,7 +207,7 @@ import requests
 # Speed test
 def run_speed_test():
     try:
-        response = requests.post('http://localhost:8080/api/speedtest')
+        response = requests.post('http://localhost:59733/api/speedtest')
         data = response.json()
         print(f"Download: {data['download']} Mbps")
         print(f"Upload: {data['upload']} Mbps")
@@ -218,7 +218,7 @@ def run_speed_test():
 # System info
 def get_system_info():
     try:
-        response = requests.get('http://localhost:8080/api/info')
+        response = requests.get('http://localhost:59733/api/info')
         data = response.json()
         print(f"OS: {data['os']}")
         print(f"CPU: {data['cpu']}")
@@ -251,7 +251,7 @@ All endpoints return JSON error messages:
 ### Start the Server
 
 ```bash
-# Default port 8080
+# Default port 59733
 auraspeed web
 
 # Custom port
@@ -260,7 +260,7 @@ auraspeed web --port 3000
 
 ### Output:
 ```
-Starting AuraSpeed web server on http://localhost:8080
+Starting AuraSpeed web server on http://localhost:59733
 Press Ctrl+C to stop
 ```
 

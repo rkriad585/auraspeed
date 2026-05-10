@@ -5,7 +5,7 @@ services:
     build: .
     container_name: auraspeed
     ports:
-      - "8080:8080"
+      - "59733:59733"
     environment:
       - AURASPEED_LOGLEVEL=info
       - AURASPEED_AUTOUPDATE=false
@@ -13,7 +13,7 @@ services:
       - auraspeed-config:/root/.config/neostore/auraspeed
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:59733/health"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -14,8 +14,8 @@ The `web` command starts an HTTP server that exposes AuraSpeed functionality via
 auraspeed web
 ```
 
-Default port: `8080`
-Base URL: `http://localhost:8080`
+Default port: `59733`
+Base URL: `http://localhost:59733`
 
 ### Custom Port
 
@@ -49,14 +49,14 @@ auraspeed web --help
 ### Health Check
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:59733/health
 # Output: {"status": "ok", "service": "auraspeed"}
 ```
 
 ### Speed Test
 
 ```bash
-curl -X POST http://localhost:8080/api/speedtest
+curl -X POST http://localhost:59733/api/speedtest
 ```
 
 **Response:**
@@ -73,7 +73,7 @@ curl -X POST http://localhost:8080/api/speedtest
 ### System Information
 
 ```bash
-curl http://localhost:8080/api/info
+curl http://localhost:59733/api/info
 ```
 
 **Response:**
@@ -93,7 +93,7 @@ curl http://localhost:8080/api/info
 
 ## Web UI
 
-Open in browser: `http://localhost:8080`
+Open in browser: `http://localhost:59733`
 
 The UI provides:
 - **Run Speed Test** button — triggers speed test
@@ -111,17 +111,17 @@ The UI provides:
 auraspeed web &
 
 # Run tests from command line
-curl -X POST http://localhost:8080/api/speedtest
+curl -X POST http://localhost:59733/api/speedtest
 ```
 
 ### 2. Remote Monitoring
 
 ```bash
 # On remote machine
-auraspeed web --port 8080
+auraspeed web --port 59733
 
 # From local machine
-curl http://remote-machine:8080/api/info
+curl http://remote-machine:59733/api/info
 ```
 
 ### 3. Integration Testing
@@ -132,7 +132,7 @@ auraspeed web &
 sleep 2
 
 # Run test
-response=$(curl -s -X POST http://localhost:8080/api/speedtest)
+response=$(curl -s -X POST http://localhost:59733/api/speedtest)
 echo $response | jq '.download'
 ```
 
@@ -144,7 +144,7 @@ echo $response | jq '.download'
 
 while true; do
     echo "=== $(date) ==="
-    curl -s -X POST http://localhost:8080/api/speedtest | jq '.'
+    curl -s -X POST http://localhost:59733/api/speedtest | jq '.'
     sleep 3600  # Every hour
 done
 ```
@@ -190,7 +190,7 @@ Config file location:
 
 **Error:**
 ```
-listen tcp :8080: bind: Only one usage of each socket address is normally permitted.
+listen tcp :59733: bind: Only one usage of each socket address is normally permitted.
 ```
 
 **Fix:**
@@ -244,13 +244,13 @@ auraspeed --log-level debug web
 
 ```bash
 # Health check
-curl http://localhost:8080/health
+curl http://localhost:59733/health
 
 # Speed test
-curl -X POST http://localhost:8080/api/speedtest | jq '.'
+curl -X POST http://localhost:59733/api/speedtest | jq '.'
 
 # System info
-curl http://localhost:8080/api/info | jq '.'
+curl http://localhost:59733/api/info | jq '.'
 ```
 
 ---

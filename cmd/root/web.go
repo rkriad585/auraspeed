@@ -99,7 +99,7 @@ func NewWebCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().IntVarP(&port, "port", "p", 8080, "Port to listen on")
+	cmd.Flags().IntVarP(&port, "port", "p", 59733, "Port to listen on")
 	cmd.Flags().StringVar(&authKey, "auth", "", "API key for authentication")
 	cmd.Flags().BoolVar(&enableTLS, "tls", false, "Enable TLS/HTTPS")
 	cmd.Flags().StringVar(&certFile, "cert", "", "TLS certificate file path")
