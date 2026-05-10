@@ -21,13 +21,17 @@ Write-Host ""
 
 # Detect architecture
 $arch = "amd64"
-if ([Environment]::Is64BitOperatingSystem) {
-    try {
-        $cpuInfo = Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue
-        if ($cpuInfo -and $cpuInfo.Architecture -eq 9) { $arch = "arm64" }
-    } catch {
-        # fallback to amd64
+try {
+    $cpuInfo = Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue
+    if ($cpuInfo) {
+        switch ($cpuInfo.Architecture) {
+            9  { $arch = "amd64" }   # x64 (AMD64/Intel 64)
+            12 { $arch = "arm64" }   # ARM64
+            5  { $arch = "arm64" }   # ARM
+        }
     }
+} catch {
+    # fallback to amd64
 }
 
 $binName = "$projectName.exe"
