@@ -106,28 +106,19 @@ func selfUninstall() error {
 	// Remove auraspeed app directory (~/.config/neostore/auraspeed)
 	auraspeedBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed")
 	if _, err := os.Stat(auraspeedBinDir); err == nil {
-		// Try to remove the bin file first (in case it's still locked)
+		// Remove all files in bin directory first
 		binPath := filepath.Join(auraspeedBinDir, "bin")
 		if _, err := os.Stat(binPath); err == nil {
-			// Try to remove files in bin directory
-			os.ReadDir(binPath)
 			entries, _ := os.ReadDir(binPath)
 			for _, entry := range entries {
 				filePath := filepath.Join(binPath, entry.Name())
 				os.Remove(filePath)
 			}
-			// Remove bin directory
 			os.Remove(binPath)
 		}
 		// Remove auraspeed directory
 		os.RemoveAll(auraspeedBinDir)
 		fmt.Printf("Removed app directory: %s\n", auraspeedBinDir)
-	}
-
-	// Remove empty neostore directory
-	neostoreDir := filepath.Join(homeDir, ".config", "neostore")
-	if _, err := os.Stat(neostoreDir); err == nil {
-		os.RemoveAll(neostoreDir)
 	}
 
 	if !removedAny {
