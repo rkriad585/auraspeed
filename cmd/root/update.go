@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -88,16 +91,100 @@ func compareVersions(v1, v2 string) int {
 	return 0
 }
 
+// downloadUpdate downloads the binary for the given version and installs it
+func downloadUpdate(version string) error {
+	targetDir := installDir()
+	binName := "auraspeed"
+	if runtime.GOOS == "windows" {
+		binName = "auraspeed.exe"
+	}
+	targetPath := filepath.Join(targetDir, binName)
+
+	repo := "rkriad585/auraspeed"
+	var downloadName string
+
+	switch runtime.GOOS {
+	case "windows":
+		switch runtime.GOARCH {
+		case "arm64":
+			downloadName = "auraspeed-windows-arm64.exe"
+		default:
+			downloadName = "auraspeed-windows-amd64.exe"
+		}
+	case "darwin":
+		switch runtime.GOARCH {
+		case "arm64":
+			downloadName = "auraspeed-darwin-arm64"
+		default:
+			downloadName = "auraspeed-darwin-amd64"
+		}
+	case "linux":
+		switch runtime.GOARCH {
+		case "arm64":
+			downloadName = "auraspeed-linux-arm64"
+		default:
+			downloadName = "auraspeed-linux-amd64"
+		}
+	default:
+		return fmt.Errorf("unsupported platform: %s/%s", runtime.GOOS, runtime.GOARCH)
+	}
+
+	url := fmt.Sprintf("https://github.com/%s/releases/download/%s/%s", repo, version, downloadName)
+
+	fmt.Printf(">>> Downloading %s\n", url)
+
+	client := &http.Client{Timeout: 60 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		return fmt.Errorf("download failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("download failed: HTTP %d", resp.StatusCode)
+	}
+
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		return fmt.Errorf("failed to create install directory: %w", err)
+	}
+
+	out, err := os.Create(targetPath)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer out.Close()
+
+	written, err := io.Copy(out, resp.Body)
+	if err != nil {
+		out.Close()
+		os.Remove(targetPath)
+		return fmt.Errorf("failed to write file: %w", err)
+	}
+	out.Close()
+
+	if written == 0 {
+		os.Remove(targetPath)
+		return fmt.Errorf("downloaded empty file")
+	}
+
+	if runtime.GOOS != "windows" {
+		os.Chmod(targetPath, 0755)
+	}
+
+	fmt.Printf("OK   Installed to %s (%d bytes)\n", targetPath, written)
+	return nil
+}
+
 // NewUpdateCommand returns the update subcommand
 func NewUpdateCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update",
-		Short: "Check for updates",
-		Long:  "Check if a newer version of AuraSpeed is available.",
+		Short: "Update AuraSpeed to the latest version",
+		Long:  "Check for and download the latest version of AuraSpeed.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			currentVersion := Version
 			if currentVersion == "dev" {
-				fmt.Println("Running from source - cannot check for updates.")
+				fmt.Println("Running from source - cannot update.")
 				return nil
 			}
 
@@ -112,8 +199,10 @@ func NewUpdateCommand() *cobra.Command {
 			switch comparison {
 			case -1:
 				fmt.Printf("Update available: %s -> %s\n", currentVersion, latestVersion)
-				fmt.Println("Download from: https://github.com/rkriad585/auraspeed/releases")
-				fmt.Println("Or run the installer script to update.")
+				if err := downloadUpdate(latestVersion); err != nil {
+					return fmt.Errorf("update failed: %w", err)
+				}
+				fmt.Println("OK   AuraSpeed has been updated! Restart the application to use the new version.")
 			case 0:
 				fmt.Printf("OK   You are running the latest version: %s\n", currentVersion)
 			case 1:
