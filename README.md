@@ -381,6 +381,12 @@ Quick start:
 
 Ensure your changes pass `go test ./...` and adhere to Go best practices.
 
+## Authors
+
+- **rkriad585** — [github.com/rkriad585](https://github.com/rkriad585)
+
+See [AUTHORS](AUTHORS) for the full list of contributors.
+
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
