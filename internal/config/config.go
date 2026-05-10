@@ -72,7 +72,7 @@ func Init(appName string) error {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	configDir = filepath.Join(home, "."+appName)
+	configDir = filepath.Join(home, ".config", "neostore", appName)
 	dataDir = filepath.Join(configDir, "data")
 	configFile = filepath.Join(configDir, "config.toml")
 	historyFile = filepath.Join(dataDir, "history.json")

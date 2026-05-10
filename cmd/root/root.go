@@ -83,21 +83,6 @@ func selfUninstall() int {
 
 	fmt.Println(">>> Uninstalling AuraSpeed...")
 
-	if _, err := os.Stat(configDir); err == nil {
-		if err := os.RemoveAll(configDir); err != nil {
-			if runtime.GOOS == "windows" {
-				fmt.Fprintf(os.Stderr, "Warning: could not remove all files (binary in use).\n")
-			} else {
-				fmt.Fprintf(os.Stderr, "Error removing config directory: %v\n", err)
-				return 1
-			}
-		} else {
-			fmt.Println("OK   Removed config directory:", configDir)
-		}
-	} else {
-		fmt.Println("OK   No config directory found.")
-	}
-
 	exePath, err := os.Executable()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error resolving binary path: %v\n", err)
@@ -110,18 +95,26 @@ func selfUninstall() int {
 	}
 
 	if runtime.GOOS == "windows" {
-		batContent := fmt.Sprintf("@echo off\r\ntimeout /t 1 /nobreak >nul\r\ndel /f /q \"%s\"\r\nif exist \"%s\" (echo ERR Failed to delete binary) else (echo OK   Deleted binary: %s)\r\ndel /f /q \"%%~f0\"\r\n", exePath, exePath, exePath)
+		batContent := fmt.Sprintf("@echo off\r\ntimeout /t 1 /nobreak >nul\r\ndel /f /q \"%s\"\r\nif exist \"%s\" (echo ERR Failed to delete binary) else (echo OK   Deleted binary: %s)\r\nrd /s /q \"%s\"\r\ndel /f /q \"%%~f0\"\r\n", exePath, exePath, exePath, configDir)
 		batPath := filepath.Join(os.TempDir(), "auraspeed-uninstall.bat")
 		if err := os.WriteFile(batPath, []byte(batContent), 0644); err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating uninstall script: %v\n", err)
 			fmt.Println("Please manually delete:", exePath)
 			return 1
 		}
-		fmt.Println("OK   Uninstall script created. Binary will be deleted shortly.")
-		cmd := exec.Command("cmd", "/C", "start", "/B", batPath)
-		cmd.Stderr = os.Stderr
-		cmd.Start()
+		fmt.Println("OK   Uninstall script created. Binary and config will be deleted shortly.")
+		exec.Command("cmd", "/C", "start", "/B", batPath).Start()
 	} else {
+		if _, err := os.Stat(configDir); err == nil {
+			if err := os.RemoveAll(configDir); err != nil {
+				fmt.Fprintf(os.Stderr, "Error removing config directory: %v\n", err)
+				return 1
+			}
+			fmt.Println("OK   Removed config directory:", configDir)
+		} else {
+			fmt.Println("OK   No config directory found.")
+		}
+
 		if err := os.Remove(exePath); err != nil {
 			fmt.Fprintf(os.Stderr, "Error deleting binary: %v\n", err)
 			fmt.Println("Please manually delete:", exePath)
