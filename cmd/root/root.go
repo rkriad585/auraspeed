@@ -104,11 +104,11 @@ func selfUninstall() error {
 		fmt.Printf("Removed configuration: %s\n", configDir)
 	}
 
-	// Remove .config/neostore directory if empty
-	neostoreDir := filepath.Join(homeDir, ".config", "neostore")
-	if _, err := os.Stat(neostoreDir); err == nil {
-		os.RemoveAll(neostoreDir)
-		fmt.Printf("Removed app data: %s\n", neostoreDir)
+	// Remove auraspeed bin directory
+	auraspeedBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed")
+	if _, err := os.Stat(auraspeedBinDir); err == nil {
+		os.RemoveAll(auraspeedBinDir)
+		fmt.Printf("Removed app directory: %s\n", auraspeedBinDir)
 	}
 
 	if !removedAny {
