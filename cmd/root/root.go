@@ -61,12 +61,6 @@ Use 'auraspeed [command] --help' for more information about a command.`,
 
 // selfUninstall removes the current binary and its configuration
 func selfUninstall() error {
-	// Get the current executable path
-	execPath, err := os.Executable()
-	if err != nil {
-		return fmt.Errorf("failed to get executable path: %w", err)
-	}
-
 	fmt.Println("Uninstalling AuraSpeed...")
 
 	// Get home directory
@@ -75,32 +69,30 @@ func selfUninstall() error {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
 
-	removed := false
+	// Define possible install locations
+	locations := []string{
+		filepath.Join(homeDir, ".config", "neostore", "auraspeed", "bin", "auraspeed"),
+		filepath.Join(homeDir, ".local", "bin", "auraspeed"),
+		filepath.Join(homeDir, "bin", "auraspeed"),
+		"/usr/local/bin/auraspeed",
+		"/usr/bin/auraspeed",
+	}
 
-	// Try to remove from config bin directory first
-	configBinDir := filepath.Join(homeDir, ".config", "neostore", "auraspeed", "bin")
-	binPath := filepath.Join(configBinDir, "auraspeed")
 	if runtime.GOOS == "windows" {
-		binPath += ".exe"
-	}
-	if _, err := os.Stat(binPath); err == nil {
-		if err := os.Remove(binPath); err == nil {
-			fmt.Printf("Removed from config: %s\n", binPath)
-			removed = true
+		// Add .exe versions for Windows
+		for i := range locations {
+			locations[i] += ".exe"
 		}
 	}
 
-	// Try to remove from PATH location
-	pathDirs := filepath.SplitList(os.Getenv("PATH"))
-	for _, dir := range pathDirs {
-		possiblePath := filepath.Join(dir, "auraspeed")
-		if runtime.GOOS == "windows" {
-			possiblePath += ".exe"
-		}
-		if _, err := os.Stat(possiblePath); err == nil {
-			if err := os.Remove(possiblePath); err == nil {
-				fmt.Printf("Removed from PATH: %s\n", possiblePath)
-				removed = true
+	removedAny := false
+
+	// Try to remove from all known locations
+	for _, loc := range locations {
+		if _, err := os.Stat(loc); err == nil {
+			if err := os.Remove(loc); err == nil {
+				fmt.Printf("Removed: %s\n", loc)
+				removedAny = true
 			}
 		}
 	}
@@ -112,19 +104,15 @@ func selfUninstall() error {
 		fmt.Printf("Removed configuration: %s\n", configDir)
 	}
 
-	// Remove the current executable if it's different from config bin
-	if _, err := os.Stat(execPath); err == nil {
-		// Only remove if not already removed (in case execPath is same as binPath)
-		if execPath != binPath {
-			if err := os.Remove(execPath); err == nil {
-				fmt.Printf("Removed executable: %s\n", execPath)
-				removed = true
-			}
-		}
+	// Remove .config/neostore directory if empty
+	neostoreDir := filepath.Join(homeDir, ".config", "neostore")
+	if _, err := os.Stat(neostoreDir); err == nil {
+		os.RemoveAll(neostoreDir)
+		fmt.Printf("Removed app data: %s\n", neostoreDir)
 	}
 
-	if !removed {
-		fmt.Println("No AuraSpeed installation found in expected locations.")
+	if !removedAny {
+		fmt.Println("No AuraSpeed binary found in standard locations.")
 	}
 
 	fmt.Println("")

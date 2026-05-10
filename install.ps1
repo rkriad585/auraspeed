@@ -3,17 +3,25 @@
 
 $ErrorActionPreference = "Stop"
 
-$RELEASE_URL = "https://github.com/rkriad585/auraspeed/releases/download/v3.0.0"
-$BIN_DIR = "$env:USERPROFILE\.config\neostore\auraspeed\bin"
-$BIN_NAME = "auraspeed.exe"
-$VERSION = "3.0.0"
+$VERSION_URL = "https://raw.githubusercontent.com/rkriad585/auraspeed/main/.version"
+$RELEASE_URL = "https://github.com/rkriad585/auraspeed/releases/download"
 
-Write-Host "AuraSpeed Installer v$VERSION" -ForegroundColor Cyan
+# Get latest version from GitHub
+try {
+    $VERSION = (Invoke-WebRequest -Uri $VERSION_URL -UseBasicParsing).Content.Trim()
+    if (-not $VERSION) { $VERSION = "v3.0.1" }
+} catch {
+    $VERSION = "v3.0.1"
+}
+
+Write-Host "AuraSpeed Installer $VERSION" -ForegroundColor Cyan
 Write-Host "==============================" -ForegroundColor Cyan
 
 # Detect architecture
-$arch = "amd64"
-$os = "windows"
+$BIN_NAME = "auraspeed.exe"
+
+# Set install directory
+$BIN_DIR = "$env:USERPROFILE\.config\neostore\auraspeed\bin"
 
 # Create bin directory
 if (-not (Test-Path $BIN_DIR)) {
@@ -22,10 +30,10 @@ if (-not (Test-Path $BIN_DIR)) {
 }
 
 # Download binary
-$downloadUrl = "$RELEASE_URL/auraspeed-$os-$arch.exe"
+$downloadUrl = "$RELEASE_URL/$VERSION/auraspeed-windows-amd64.exe"
 $outputPath = Join-Path $BIN_DIR $BIN_NAME
 
-Write-Host "Downloading AuraSpeed from: $downloadUrl"
+Write-Host "Downloading AuraSpeed v$VERSION from: $downloadUrl"
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Invoke-WebRequest -Uri $downloadUrl -OutFile $outputPath -UseBasicParsing

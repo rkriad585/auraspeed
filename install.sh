@@ -4,8 +4,17 @@
 
 set -e
 
-RELEASE_URL="https://github.com/rkriad585/auraspeed/releases/download/v3.0.0"
-VERSION="3.0.0"
+VERSION_URL="https://raw.githubusercontent.com/rkriad585/auraspeed/main/.version"
+RELEASE_URL="https://github.com/rkriad585/auraspeed/releases/download"
+
+# Get latest version from GitHub
+VERSION=$(curl -sL "$VERSION_URL" | tr -d '[:space:]')
+if [ -z "$VERSION" ]; then
+    VERSION="v3.0.1"
+fi
+
+echo "AuraSpeed Installer ${VERSION}"
+echo "=============================="
 
 # Detect OS and architecture
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -19,21 +28,18 @@ elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
 fi
 
 # Set binary name based on OS
-if [ "$OS" = "windows" ]; then
-    BIN_NAME="auraspeed.exe"
+if [ "$OS" = "darwin" ]; then
+    BIN_NAME="auraspeed"
 else
     BIN_NAME="auraspeed"
 fi
 
 # Set download URL
 if [ "$OS" = "darwin" ]; then
-    DOWNLOAD_URL="${RELEASE_URL}/auraspeed-darwin-${ARCH}"
+    DOWNLOAD_URL="${RELEASE_URL}/${VERSION}/auraspeed-darwin-${ARCH}"
 else
-    DOWNLOAD_URL="${RELEASE_URL}/auraspeed-linux-${ARCH}"
+    DOWNLOAD_URL="${RELEASE_URL}/${VERSION}/auraspeed-linux-${ARCH}"
 fi
-
-echo "AuraSpeed Installer v${VERSION}"
-echo "=============================="
 
 # Determine config directory
 if [ -n "$XDG_CONFIG_HOME" ]; then
@@ -47,7 +53,7 @@ echo "Creating installation directory: $BIN_DIR"
 mkdir -p "$BIN_DIR"
 
 # Download binary
-echo "Downloading AuraSpeed from: $DOWNLOAD_URL"
+echo "Downloading AuraSpeed v$VERSION from: $DOWNLOAD_URL"
 curl -L -o "$BIN_DIR/$BIN_NAME" "$DOWNLOAD_URL" || {
     echo "Error: Failed to download AuraSpeed"
     exit 1
