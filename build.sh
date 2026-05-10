@@ -1,20 +1,20 @@
 #!/bin/bash
 # Build script for AuraSpeed (Bash/Zsh/Fish compatible)
-# Builds for Windows (amd64), Linux (amd64), macOS (amd64, arm64)
+# Builds cross-platform binaries and saves to bin/
 
 set -e
 
 PROJECT_NAME="auraspeed"
-OUTPUT_DIR="dist"
+OUTPUT_DIR="bin"
 
-# Get version from .version file, fallback to git tag, then "dev"
+# Get version from .version file
 if [ -f ".version" ]; then
     VERSION=$(cat .version | tr -d '[:space:]')
     if [ -z "$VERSION" ]; then
-        VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+        VERSION="dev"
     fi
 else
-    VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+    VERSION="dev"
 fi
 
 # Get commit hash
@@ -33,7 +33,9 @@ mkdir -p "$OUTPUT_DIR"
 # Build targets
 declare -a TARGETS=(
     "windows:amd64:${PROJECT_NAME}-windows-amd64.exe"
+    "windows:arm64:${PROJECT_NAME}-windows-arm64.exe"
     "linux:amd64:${PROJECT_NAME}-linux-amd64"
+    "linux:arm64:${PROJECT_NAME}-linux-arm64"
     "darwin:amd64:${PROJECT_NAME}-darwin-amd64"
     "darwin:arm64:${PROJECT_NAME}-darwin-arm64"
 )

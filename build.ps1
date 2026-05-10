@@ -1,25 +1,18 @@
 # Build script for AuraSpeed
-# Builds for Windows (amd64), Linux (amd64), macOS (amd64, arm64)
+# Builds cross-platform binaries and saves to bin/
 
 $ErrorActionPreference = "Stop"
 
 $projectName = "auraspeed"
-$outputDir = "dist"
+$outputDir = "bin"
 
-# Get version from .version file, fallback to git tag, then "dev"
+# Get version from .version file
 $version = "dev"
 $versionFile = ".version"
 if (Test-Path $versionFile) {
     $version = Get-Content $versionFile -Raw
     $version = $version.Trim()
     if (-not $version) { $version = "dev" }
-} else {
-    try {
-        $version = git describe --tags --abbrev=0 2>$null
-        if (-not $version) { $version = "dev" }
-    } catch {
-        $version = "dev"
-    }
 }
 
 # Get commit hash
@@ -45,9 +38,11 @@ if (-not (Test-Path $outputDir)) {
 # Build targets
 $targets = @(
     @{ GOOS = "windows"; GOARCH = "amd64"; Output = "$projectName-windows-amd64.exe" },
-    @{ GOOS = "linux"; GOARCH = "amd64"; Output = "$projectName-linux-amd64" },
-    @{ GOOS = "darwin"; GOARCH = "amd64"; Output = "$projectName-darwin-amd64" },
-    @{ GOOS = "darwin"; GOARCH = "arm64"; Output = "$projectName-darwin-arm64" }
+    @{ GOOS = "windows"; GOARCH = "arm64"; Output = "$projectName-windows-arm64.exe" },
+    @{ GOOS = "linux";   GOARCH = "amd64"; Output = "$projectName-linux-amd64" },
+    @{ GOOS = "linux";   GOARCH = "arm64"; Output = "$projectName-linux-arm64" },
+    @{ GOOS = "darwin";  GOARCH = "amd64"; Output = "$projectName-darwin-amd64" },
+    @{ GOOS = "darwin";  GOARCH = "arm64"; Output = "$projectName-darwin-arm64" }
 )
 
 # LDFLAGS for version info
