@@ -1,62 +1,82 @@
 # AuraSpeed Installer for Windows
 # Downloads and installs AuraSpeed to ~/.config/neostore/auraspeed/bin/
+# and adds it to the user PATH.
 
 $ErrorActionPreference = "Stop"
 
-$VERSION_URL = "https://raw.githubusercontent.com/rkriad585/auraspeed/main/.version"
-$RELEASE_URL = "https://github.com/rkriad585/auraspeed/releases/download"
+$projectName = "auraspeed"
+$versionUrl = "https://raw.githubusercontent.com/rkriad585/$projectName/main/.version"
+$releaseUrl = "https://github.com/rkriad585/$projectName/releases/download"
 
 # Get latest version from GitHub
 try {
-    $VERSION = (Invoke-WebRequest -Uri $VERSION_URL -UseBasicParsing).Content.Trim()
-    if (-not $VERSION) { $VERSION = "v3.0.1" }
+    $version = (Invoke-WebRequest -Uri $versionUrl -UseBasicParsing).Content.Trim()
+    if (-not $version) { $version = "dev" }
 } catch {
-    $VERSION = "v3.0.1"
+    $version = "dev"
 }
 
-Write-Host "AuraSpeed Installer $VERSION" -ForegroundColor Cyan
-Write-Host "==============================" -ForegroundColor Cyan
+Write-Host ">>> Installing $projectName $version..." -ForegroundColor Cyan
+Write-Host ""
 
 # Detect architecture
-$BIN_NAME = "auraspeed.exe"
+$arch = "amd64"
+if ([Environment]::Is64BitOperatingSystem) {
+    try {
+        $cpuInfo = Get-WmiObject -Class Win32_Processor -ErrorAction SilentlyContinue
+        if ($cpuInfo -and $cpuInfo.Architecture -eq 9) { $arch = "arm64" }
+    } catch {
+        # fallback to amd64
+    }
+}
 
-# Set install directory
-$BIN_DIR = "$env:USERPROFILE\.config\neostore\auraspeed\bin"
+$binName = "$projectName.exe"
+$downloadName = "$projectName-windows-$arch.exe"
+
+# Install directory
+$binDir = "$env:USERPROFILE\.config\neostore\$projectName\bin"
 
 # Create bin directory
-if (-not (Test-Path $BIN_DIR)) {
-    Write-Host "Creating installation directory: $BIN_DIR"
-    New-Item -ItemType Directory -Path $BIN_DIR -Force | Out-Null
+if (-not (Test-Path $binDir)) {
+    New-Item -ItemType Directory -Path $binDir -Force | Out-Null
 }
 
 # Download binary
-$downloadUrl = "$RELEASE_URL/$VERSION/auraspeed-windows-amd64.exe"
-$outputPath = Join-Path $BIN_DIR $BIN_NAME
+$downloadUrl = "$releaseUrl/$version/$downloadName"
+$outputPath = Join-Path $binDir $binName
 
-Write-Host "Downloading AuraSpeed v$VERSION from: $downloadUrl"
+Write-Host "Downloading $downloadUrl"
 try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Invoke-WebRequest -Uri $downloadUrl -OutFile $outputPath -UseBasicParsing
-    Write-Host "Download complete!" -ForegroundColor Green
 } catch {
     Write-Host "Error downloading: $_" -ForegroundColor Red
     exit 1
 }
 
-# Add to PATH
+if (-not (Test-Path $outputPath)) {
+    Write-Host "Error: Download failed - output file not found" -ForegroundColor Red
+    exit 1
+}
+
+$fileSize = (Get-Item $outputPath).Length / 1KB
+Write-Host "OK   Installed to $outputPath ($($fileSize.ToString('0.0')) KB)" -ForegroundColor Green
+
+# Add to user PATH
 $userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
-$pathEntry = $BIN_DIR
+$pathEntry = $binDir
 
 if ($userPath -notlike "*$pathEntry*") {
-    Write-Host "Adding to user PATH..."
-    [Environment]::SetEnvironmentVariable("PATH", "$userPath;$pathEntry", "User")
-    Write-Host "PATH updated. You may need to restart your terminal." -ForegroundColor Yellow
+    if ($userPath.EndsWith(";") -or [string]::IsNullOrEmpty($userPath)) {
+        [Environment]::SetEnvironmentVariable("PATH", "$userPath$pathEntry", "User")
+    } else {
+        [Environment]::SetEnvironmentVariable("PATH", "$userPath;$pathEntry", "User")
+    }
+    Write-Host "Added to PATH. You may need to restart your terminal." -ForegroundColor Yellow
 } else {
     Write-Host "Already in PATH" -ForegroundColor Green
 }
 
 Write-Host ""
-Write-Host "Installation complete!" -ForegroundColor Green
-Write-Host ""
-Write-Host "Run 'auraspeed --help' to get started"
-Write-Host "To uninstall, run: auraspeed --selfuninstall"
+Write-Host "OK   $projectName $version installed successfully!" -ForegroundColor Green
+Write-Host "Run '$projectName --help' to get started"
