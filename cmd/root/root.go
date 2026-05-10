@@ -60,18 +60,18 @@ Use 'auraspeed [command] --help' for more information about a command.`,
 	},
 }
 
+func installDir() string {
+	dir := filepath.Join(homeDir(), ".config", "neostore", "auraspeed", "bin")
+	os.MkdirAll(dir, 0755)
+	return dir
+}
+
 func homeDir() string {
 	if runtime.GOOS == "windows" {
 		return os.Getenv("USERPROFILE")
 	}
 	h, _ := os.UserHomeDir()
 	return h
-}
-
-func installDir() string {
-	dir := filepath.Join(homeDir(), ".config", "neostore", "auraspeed", "bin")
-	os.MkdirAll(dir, 0755)
-	return dir
 }
 
 func ConfigDir() string {
@@ -130,9 +130,9 @@ func selfUninstall() int {
 	fmt.Println("and delete the line containing 'neostore/auraspeed/bin'.")
 
 	if runtime.GOOS == "windows" {
-		fmt.Println("Or run: install.ps1 --selfuninstall")
+		fmt.Println("Or run: auraspeed --selfuninstall")
 	} else {
-		fmt.Println("Or run: install.sh --selfuninstall")
+		fmt.Println("Or run: auraspeed --selfuninstall")
 	}
 
 	fmt.Println("Restart your terminal for PATH changes to take effect.")
