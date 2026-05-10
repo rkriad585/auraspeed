@@ -7,8 +7,15 @@ set -e
 PROJECT_NAME="auraspeed"
 OUTPUT_DIR="dist"
 
-# Get version from git tag or use "dev"
-VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+# Get version from .version file, fallback to git tag, then "dev"
+if [ -f ".version" ]; then
+    VERSION=$(cat .version | tr -d '[:space:]')
+    if [ -z "$VERSION" ]; then
+        VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+    fi
+else
+    VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev")
+fi
 
 # Get commit hash
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")

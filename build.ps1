@@ -6,12 +6,20 @@ $ErrorActionPreference = "Stop"
 $projectName = "auraspeed"
 $outputDir = "dist"
 
-# Get version from git tag or use "dev"
-try {
-    $version = git describe --tags --abbrev=0 2>$null
+# Get version from .version file, fallback to git tag, then "dev"
+$version = "dev"
+$versionFile = ".version"
+if (Test-Path $versionFile) {
+    $version = Get-Content $versionFile -Raw
+    $version = $version.Trim()
     if (-not $version) { $version = "dev" }
-} catch {
-    $version = "dev"
+} else {
+    try {
+        $version = git describe --tags --abbrev=0 2>$null
+        if (-not $version) { $version = "dev" }
+    } catch {
+        $version = "dev"
+    }
 }
 
 # Get commit hash
