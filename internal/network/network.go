@@ -1,6 +1,7 @@
 package network
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"os/exec"
@@ -8,9 +9,16 @@ import (
 	"strings"
 )
 
+// PingResult holds the results of a ping operation.
+type PingResult struct {
+	Host    string `json:"host"`
+	Output  string `json:"output"`
+	Success bool   `json:"success"`
+}
+
 // RunPing executes a ping command against the specified host.
 // It uses 4 pings and displays the output.
-func RunPing(host string) error {
+func RunPing(host string, jsonOutput bool) error {
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("ping", "-n", "4", host)
@@ -18,10 +26,23 @@ func RunPing(host string) error {
 		cmd = exec.Command("ping", "-c", "4", host)
 	}
 	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("ping failed: %w\n%s", err, string(output))
+	outputStr := string(output)
+
+	if jsonOutput {
+		result := PingResult{
+			Host:    host,
+			Output:  outputStr,
+			Success: err == nil,
+		}
+		jsonData, _ := json.MarshalIndent(result, "", "  ")
+		fmt.Println(string(jsonData))
+		return nil
 	}
-	fmt.Print(string(output))
+
+	if err != nil {
+		return fmt.Errorf("ping failed: %w\n%s", err, outputStr)
+	}
+	fmt.Print(outputStr)
 	return nil
 }
 
@@ -41,32 +62,48 @@ func RunTraceroute(host string) error {
 	return nil
 }
 
-// RunDNSLookup performs DNS lookup for the given host (forward or reverse).
-func RunDNSLookup(host string) error {
-	fmt.Printf("DNS Lookup for: %s\n", host)
-	fmt.Println(strings.Repeat("-", 50))
+// DNSResult holds the results of a DNS lookup.
+type DNSResult struct {
+	Host       string   `json:"host"`
+	Addresses  []string `json:"addresses,omitempty"`
+	Hostnames  []string `json:"hostnames,omitempty"`
+}
 
+// RunDNSLookup performs DNS lookup for the given host (forward or reverse).
+func RunDNSLookup(host string, jsonOutput bool) error {
 	ips, err := net.LookupHost(host)
 	if err != nil {
 		return fmt.Errorf("DNS lookup failed: %w", err)
 	}
+
+	var hostnames []string
+	if net.ParseIP(host) != nil {
+		hostnames, _ = net.LookupAddr(host)
+	}
+
+	if jsonOutput {
+		result := DNSResult{
+			Host:      host,
+			Addresses: ips,
+			Hostnames: hostnames,
+		}
+		jsonData, _ := json.MarshalIndent(result, "", "  ")
+		fmt.Println(string(jsonData))
+		return nil
+	}
+
+	fmt.Printf("DNS Lookup for: %s\n", host)
+	fmt.Println(strings.Repeat("-", 50))
 	fmt.Println("IP Addresses:")
 	for _, ip := range ips {
 		fmt.Printf("  %s\n", ip)
 	}
 
-	fmt.Println()
-
-	// Try reverse lookup if it looks like an IP
-	if net.ParseIP(host) != nil {
-		names, err := net.LookupAddr(host)
-		if err != nil {
-			fmt.Printf("Reverse lookup failed: %v\n", err)
-		} else {
-			fmt.Println("Hostnames:")
-			for _, name := range names {
-				fmt.Printf("  %s\n", name)
-			}
+	if len(hostnames) > 0 {
+		fmt.Println()
+		fmt.Println("Hostnames:")
+		for _, name := range hostnames {
+			fmt.Printf("  %s\n", name)
 		}
 	}
 

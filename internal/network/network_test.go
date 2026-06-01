@@ -6,7 +6,7 @@ import (
 
 // TestRunPing tests the ping functionality
 func TestRunPing(t *testing.T) {
-	err := RunPing("127.0.0.1")
+	err := RunPing("127.0.0.1", false)
 	if err != nil {
 		t.Errorf("ping to localhost failed: %v", err)
 	}
@@ -14,7 +14,7 @@ func TestRunPing(t *testing.T) {
 
 // TestRunPingInvalid tests ping with invalid host
 func TestRunPingInvalid(t *testing.T) {
-	err := RunPing("invalid.host.that.does.not.exist.test")
+	err := RunPing("invalid.host.that.does.not.exist.test", false)
 	if err == nil {
 		t.Log("ping to invalid host succeeded (unexpected), but test passed")
 	}
@@ -22,7 +22,7 @@ func TestRunPingInvalid(t *testing.T) {
 
 // TestRunDNSLookup tests DNS lookup for valid domain
 func TestRunDNSLookup(t *testing.T) {
-	err := RunDNSLookup("google.com")
+	err := RunDNSLookup("google.com", false)
 	if err != nil {
 		t.Errorf("DNS lookup failed: %v", err)
 	}
@@ -30,7 +30,7 @@ func TestRunDNSLookup(t *testing.T) {
 
 // TestRunDNSLookupIP tests DNS lookup for IP address
 func TestRunDNSLookupIP(t *testing.T) {
-	err := RunDNSLookup("8.8.8.8")
+	err := RunDNSLookup("8.8.8.8", false)
 	if err != nil {
 		t.Errorf("DNS lookup for IP failed: %v", err)
 	}
@@ -38,7 +38,7 @@ func TestRunDNSLookupIP(t *testing.T) {
 
 // TestRunDNSLookupInvalid tests DNS lookup for invalid domain
 func TestRunDNSLookupInvalid(t *testing.T) {
-	err := RunDNSLookup("invalid.domain.test.12345")
+	err := RunDNSLookup("invalid.domain.test.12345", false)
 	if err == nil {
 		t.Error("expected error for invalid domain, got nil")
 	}

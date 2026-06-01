@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/spf13/viper"
 )
 
 var (
 	cfg         *Config
+	cfgMu       sync.RWMutex
 	configDir   string
 	configFile  string
 	historyFile string
@@ -127,18 +129,24 @@ func Init(appName string) error {
 				fmt.Fprintf(os.Stderr, "Warning: Could not write default config: %v\n", err)
 			}
 		}
+		cfgMu.Lock()
 		cfg = &defaultConfig
+		cfgMu.Unlock()
 		return nil
 	}
 
-	if err := viper.Unmarshal(&cfg); err != nil {
+	var parsed Config
+	if err := viper.Unmarshal(&parsed); err != nil {
 		return fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
-	// Validate configuration
-	if err := cfg.Validate(); err != nil {
+	if err := parsed.Validate(); err != nil {
 		return fmt.Errorf("invalid configuration: %w", err)
 	}
+
+	cfgMu.Lock()
+	cfg = &parsed
+	cfgMu.Unlock()
 
 	return nil
 }
@@ -213,6 +221,15 @@ func GetDefaultConfig() Config {
 // Get returns the current configuration.
 // If not initialized, it returns a default config.
 func Get() *Config {
+	cfgMu.RLock()
+	if cfg != nil {
+		defer cfgMu.RUnlock()
+		return cfg
+	}
+	cfgMu.RUnlock()
+
+	cfgMu.Lock()
+	defer cfgMu.Unlock()
 	if cfg == nil {
 		defaultCfg := GetDefaultConfig()
 		cfg = &defaultCfg

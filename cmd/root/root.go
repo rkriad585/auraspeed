@@ -133,6 +133,30 @@ func selfUninstall() int {
 	return 0
 }
 
+func newCompletionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "completion [bash|zsh|fish|powershell]",
+		Short: "Generate shell completion scripts",
+		Long:  "Generate shell completion script for bash, zsh, fish, or PowerShell.",
+		Args:  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
+		ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			switch args[0] {
+			case "bash":
+				return rootCmd.GenBashCompletion(cmd.OutOrStdout())
+			case "zsh":
+				return rootCmd.GenZshCompletion(cmd.OutOrStdout())
+			case "fish":
+				return rootCmd.GenFishCompletion(cmd.OutOrStdout(), true)
+			case "powershell":
+				return rootCmd.GenPowerShellCompletion(cmd.OutOrStdout())
+			default:
+				return fmt.Errorf("unsupported shell: %s", args[0])
+			}
+		},
+	}
+}
+
 func Execute() error {
 	for _, arg := range os.Args {
 		if arg == "--selfuninstall" || arg == "--uninstall" {
@@ -169,4 +193,24 @@ func init() {
 	rootCmd.AddCommand(NewUpdateCommand())
 	rootCmd.AddCommand(NewServersCommand())
 	rootCmd.AddCommand(NewInstallCommand())
+	rootCmd.AddCommand(newCompletionCmd())
+
+	registerCommandAliases()
+}
+
+func registerCommandAliases() {
+	aliases := map[string]string{
+		"st":   "speedtest",
+		"si":   "info",
+		"net":  "network",
+		"hist": "history",
+	}
+	for alias, target := range aliases {
+		for _, cmd := range rootCmd.Commands() {
+			if cmd.Name() == target {
+				cmd.Aliases = append(cmd.Aliases, alias)
+				break
+			}
+		}
+	}
 }

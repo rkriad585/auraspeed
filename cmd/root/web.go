@@ -2,15 +2,18 @@ package root
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	st "github.com/showwin/speedtest-go/speedtest"
@@ -19,6 +22,9 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
+//go:embed web.html
+var webHTML string
 
 // rateLimiter implements a simple token bucket rate limiter
 type rateLimiter struct {
@@ -226,27 +232,24 @@ func startWebServer(port int, enableTLS bool, certFile, keyFile string) error {
 			s.Context = st.New()
 		}
 
-		done := make(chan error, 2)
-		go func() {
-			done <- s.DownloadTest()
-		}()
-		go func() {
-			done <- s.UploadTest()
-		}()
+		if err := s.DownloadTest(); err != nil {
+			atomic.AddInt64(&metricsSpeedTestsFailed, 1)
+			http.Error(w, fmt.Sprintf("Download test failed: %v", err), http.StatusInternalServerError)
+			return
+		}
 
-		for i := 0; i < 2; i++ {
-			select {
-			case <-ctx.Done():
-				atomic.AddInt64(&metricsSpeedTestsFailed, 1)
-				http.Error(w, "Speed test timed out", http.StatusGatewayTimeout)
-				return
-			case err := <-done:
-				if err != nil {
-					atomic.AddInt64(&metricsSpeedTestsFailed, 1)
-					http.Error(w, fmt.Sprintf("Test failed: %v", err), http.StatusInternalServerError)
-					return
-				}
-			}
+		select {
+		case <-ctx.Done():
+			atomic.AddInt64(&metricsSpeedTestsFailed, 1)
+			http.Error(w, "Speed test timed out", http.StatusGatewayTimeout)
+			return
+		default:
+		}
+
+		if err := s.UploadTest(); err != nil {
+			atomic.AddInt64(&metricsSpeedTestsFailed, 1)
+			http.Error(w, fmt.Sprintf("Upload test failed: %v", err), http.StatusInternalServerError)
+			return
 		}
 
 		dlSpeed := float64(s.DLSpeed) / 1000000.0
@@ -280,15 +283,10 @@ func startWebServer(port int, enableTLS bool, certFile, keyFile string) error {
 		w.Write(jsonData)
 	})
 
-	// Simple HTML UI - serve from embedded file
+	// Simple HTML UI - served from embedded file
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
-		htmlFile, err := os.ReadFile("cmd/root/web.html")
-		if err != nil {
-			http.Error(w, "HTML template not found", http.StatusInternalServerError)
-			return
-		}
-		io.WriteString(w, string(htmlFile))
+		io.WriteString(w, webHTML)
 	})
 
 	addr := ":" + strconv.Itoa(port)
@@ -309,7 +307,9 @@ func startWebServer(port int, enableTLS bool, certFile, keyFile string) error {
 
 	// Graceful shutdown
 	go func() {
-		<-make(chan os.Signal, 1)
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+		<-sigCh
 		fmt.Println("\nShutting down web server...")
 		server.Shutdown(context.Background())
 	}()

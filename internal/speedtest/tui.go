@@ -17,6 +17,11 @@ import (
 	"github.com/showwin/speedtest-go/speedtest"
 )
 
+// TUIOptions configures the TUI behavior.
+type TUIOptions struct {
+	Fullscreen bool
+}
+
 var (
 	app         *tview.Application
 	pages       *tview.Pages
@@ -30,7 +35,14 @@ var (
 	shareLink   string
 	isTesting   atomic.Bool
 	tuiRunning  atomic.Bool
+	tuiOpts     TUIOptions
 )
+
+// RunTUIWithOptions starts the TUI with the given options.
+func RunTUIWithOptions(opts TUIOptions) error {
+	tuiOpts = opts
+	return RunTUI()
+}
 
 func StopTUI() {
 	if app != nil && tuiRunning.Load() {

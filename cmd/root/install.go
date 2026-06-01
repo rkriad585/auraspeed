@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 
 	"github.com/spf13/cobra"
 )
@@ -43,15 +44,9 @@ func NewInstallCommand() *cobra.Command {
 
 func installSystemd() error {
 	// Check if we're on Linux
-	if os.Getenv("OSTYPE") != "linux-gnu" && os.Getenv("GOOS") != "linux" {
+	if runtime.GOOS != "linux" {
 		fmt.Println("Note: systemd installation is only supported on Linux systems.")
 		fmt.Println("For other systems, please use docker-compose or manual startup.")
-	}
-
-	// Get the path to the current binary
-	execPath, err := os.Executable()
-	if err != nil {
-		return fmt.Errorf("failed to get executable path: %w", err)
 	}
 
 	// Create systemd directory if it doesn't exist
@@ -61,9 +56,13 @@ func installSystemd() error {
 	}
 
 	// Read the service file template
+	execPath, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("failed to get executable path: %w", err)
+	}
+
 	serviceContent, err := os.ReadFile("auraspeed.service")
 	if err != nil {
-		// Try alternative path
 		altPath := filepath.Join(filepath.Dir(execPath), "auraspeed.service")
 		serviceContent, err = os.ReadFile(altPath)
 		if err != nil {
@@ -71,7 +70,6 @@ func installSystemd() error {
 		}
 	}
 
-	// Write the service file
 	servicePath := filepath.Join(systemdDir, "auraspeed.service")
 	if err := os.WriteFile(servicePath, serviceContent, 0644); err != nil {
 		return fmt.Errorf("failed to write service file: %w", err)

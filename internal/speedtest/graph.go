@@ -2,6 +2,7 @@ package speedtest
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 )
@@ -83,7 +84,7 @@ func generateSimpleGraph(data []float64) string {
 		}
 		graph += fmt.Sprintf("%6.1f |%s\n", maxVal*float64(h)/float64(height), line)
 	}
-	graph += "       +" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─" + "─"
+	graph += "       +" + strings.Repeat("─", width)
 
 	return graph
 }

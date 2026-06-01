@@ -257,6 +257,8 @@ func NewSpeedtestCommand() *cobra.Command {
 // NewInfoCommand returns the info subcommand.
 // It displays system information (OS, CPU, memory, disk).
 func NewInfoCommand() *cobra.Command {
+	var jsonOutput bool
+
 	cmd := &cobra.Command{
 		Use:   "info",
 		Short: "Display system information",
@@ -266,6 +268,15 @@ func NewInfoCommand() *cobra.Command {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error getting system info: %v\n", err)
 				return err
+			}
+
+			if jsonOutput {
+				jsonData, err := json.MarshalIndent(sysInfo, "", "  ")
+				if err != nil {
+					return fmt.Errorf("failed to marshal JSON: %w", err)
+				}
+				fmt.Println(string(jsonData))
+				return nil
 			}
 
 			fmt.Println("System Information")
@@ -279,6 +290,9 @@ func NewInfoCommand() *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output results in JSON format")
+
 	return cmd
 }
 
@@ -295,15 +309,17 @@ func NewNetworkCommand() *cobra.Command {
 		},
 	}
 
+	var pingJSON bool
 	pingCmd := &cobra.Command{
 		Use:   "ping <host>",
 		Short: "Ping a host",
 		Long:  "Send ICMP echo requests to a host to test connectivity.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return network.RunPing(args[0])
+			return network.RunPing(args[0], pingJSON)
 		},
 	}
+	pingCmd.Flags().BoolVar(&pingJSON, "json", false, "Output results in JSON format")
 
 	tracerouteCmd := &cobra.Command{
 		Use:   "traceroute <host>",
@@ -315,15 +331,17 @@ func NewNetworkCommand() *cobra.Command {
 		},
 	}
 
+	var dnsJSON bool
 	dnsCmd := &cobra.Command{
 		Use:   "dns <host>",
 		Short: "DNS lookup",
 		Long:  "Perform DNS lookup for a hostname or IP address.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return network.RunDNSLookup(args[0])
+			return network.RunDNSLookup(args[0], dnsJSON)
 		},
 	}
+	dnsCmd.Flags().BoolVar(&dnsJSON, "json", false, "Output results in JSON format")
 
 	cmd.AddCommand(pingCmd)
 	cmd.AddCommand(tracerouteCmd)
