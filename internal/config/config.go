@@ -6,8 +6,22 @@ import (
 	"path/filepath"
 	"sync"
 
+	"auraspeed/internal/theme"
+
 	"github.com/spf13/viper"
 )
+
+func ApplyTheme(cfg *Config) {
+	themeName := cfg.UI.Theme
+	if themeName == "" {
+		themeName = "sunny-beach"
+	}
+	if cfg.UI.DarkMode {
+		themeName = "dark"
+	}
+	tm := theme.Global()
+	tm.Set(themeName)
+}
 
 var (
 	cfg         *Config
@@ -50,6 +64,7 @@ type UIConfig struct {
 	AutoRefresh  bool   `mapstructure:"autorefresh"`
 	RefreshRate  int    `mapstructure:"refreshrate"`
 	SaveHistory  bool   `mapstructure:"savehistory"`
+	DarkMode     bool   `mapstructure:"darkmode"`
 }
 
 // getHomeDir returns the user's home directory across platforms.
@@ -111,7 +126,8 @@ func Init(appName string) error {
 	viper.SetDefault("speedtest.defaultserverid", 0)
 	viper.SetDefault("speedtest.paralleldownloads", 4)
 	viper.SetDefault("speedtest.paralleluploads", 2)
-	viper.SetDefault("ui.theme", "default")
+	viper.SetDefault("ui.theme", "sunny-beach")
+	viper.SetDefault("ui.darkmode", false)
 	viper.SetDefault("ui.graphheight", 8)
 	viper.SetDefault("ui.historylimit", 100)
 	viper.SetDefault("ui.autorefresh", false)
@@ -147,6 +163,8 @@ func Init(appName string) error {
 	cfgMu.Lock()
 	cfg = &parsed
 	cfgMu.Unlock()
+
+	ApplyTheme(cfg)
 
 	return nil
 }
@@ -202,7 +220,8 @@ func GetDefaultConfig() Config {
 			ParallelUploads:   2,
 		},
 		UI: UIConfig{
-			Theme:        "default",
+			Theme:        "sunny-beach",
+			DarkMode:     false,
 			GraphHeight:  8,
 			HistoryLimit: 100,
 			AutoRefresh:  false,

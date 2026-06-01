@@ -104,8 +104,8 @@ func TestSpeedtestConfig(t *testing.T) {
 func TestUIConfig(t *testing.T) {
 	cfg := GetDefaultConfig()
 
-	if cfg.UI.Theme != "default" {
-		t.Errorf("expected theme 'default', got '%s'", cfg.UI.Theme)
+	if cfg.UI.Theme != "sunny-beach" {
+		t.Errorf("expected theme 'sunny-beach', got '%s'", cfg.UI.Theme)
 	}
 	if cfg.UI.GraphHeight != 8 {
 		t.Errorf("expected graphheight 8, got %d", cfg.UI.GraphHeight)

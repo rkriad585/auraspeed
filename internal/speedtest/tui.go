@@ -10,6 +10,7 @@ import (
 
 	"auraspeed/internal/config"
 	"auraspeed/internal/logging"
+	"auraspeed/internal/theme"
 
 	"github.com/atotto/clipboard"
 	"github.com/gdamore/tcell/v2"
@@ -17,7 +18,6 @@ import (
 	"github.com/showwin/speedtest-go/speedtest"
 )
 
-// TUIOptions configures the TUI behavior.
 type TUIOptions struct {
 	Fullscreen bool
 }
@@ -32,13 +32,14 @@ var (
 	jitterBox   *tview.TextView
 	graphBox    *tview.TextView
 	infoBar     *tview.TextView
+	header      *tview.TextView
+	footer      *tview.TextView
 	shareLink   string
 	isTesting   atomic.Bool
 	tuiRunning  atomic.Bool
 	tuiOpts     TUIOptions
 )
 
-// RunTUIWithOptions starts the TUI with the given options.
 func RunTUIWithOptions(opts TUIOptions) error {
 	tuiOpts = opts
 	return RunTUI()
@@ -54,27 +55,52 @@ func IsTUIRunning() bool {
 	return tuiRunning.Load()
 }
 
+func currentPalette() theme.Palette {
+	return theme.Global().Palette()
+}
+
+func applyThemeToUI() {
+	p := currentPalette()
+
+	header.SetText(fmt.Sprintf("\n[#%s]─── AURASPEED PRO: ADVANCED NETWORK ANALYZER ───", p.PrimaryHex[1:]))
+
+	fgHex := p.ForegroundHex[1:]
+	warnHex := p.WarningHex[1:]
+	errHex := p.ErrorHex[1:]
+
+	footer.SetText(fmt.Sprintf("[#%s]Press [#%s]? [#%s]Help | [#%s]C [#%s]Copy | [#%s]R [#%s]Restart | [#%s]H [#%s]History | [#%s]Esc [#%s]Close | [#%s]Ctrl+C [#%s]Exit",
+		fgHex, warnHex, fgHex, warnHex, fgHex, warnHex, fgHex, warnHex, fgHex, errHex, fgHex, errHex, fgHex))
+
+	downloadBox.SetBorderColor(p.Success)
+	uploadBox.SetBorderColor(p.Secondary)
+	pingBox.SetBorderColor(p.Warning)
+	jitterBox.SetBorderColor(p.Accent)
+	graphBox.SetBorderColor(p.Muted)
+}
+
 func RunTUI() error {
 	app = tview.NewApplication()
 	pages = tview.NewPages()
 	tuiRunning.Store(true)
 	defer tuiRunning.Store(false)
 
-	header := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true).
-		SetText("\n[#00FFFF]─── AURASPEED PRO: ADVANCED NETWORK ANALYZER ───")
+	p := currentPalette()
+
+	header = tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true).
+		SetText(fmt.Sprintf("\n[#%s]─── AURASPEED PRO: ADVANCED NETWORK ANALYZER ───", p.PrimaryHex[1:]))
 
 	infoBar = tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true).
 		SetText("Initializing Secure Connection...")
 
 	status = tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true)
 
-	downloadBox = createMetricBox("DOWNLOAD (Mbps)", tcell.ColorSpringGreen)
-	uploadBox = createMetricBox("UPLOAD (Mbps)", tcell.ColorDeepSkyBlue)
-	pingBox = createMetricBox("LATENCY (ms)", tcell.ColorYellow)
-	jitterBox = createMetricBox("JITTER (ms)", tcell.ColorOrange)
+	downloadBox = createMetricBox("DOWNLOAD (Mbps)", p.Success)
+	uploadBox = createMetricBox("UPLOAD (Mbps)", p.Secondary)
+	pingBox = createMetricBox("LATENCY (ms)", p.Warning)
+	jitterBox = createMetricBox("JITTER (ms)", p.Accent)
 
 	graphBox = tview.NewTextView().SetDynamicColors(false).SetTextAlign(tview.AlignCenter)
-	graphBox.SetBorder(true).SetTitle(" STATUS ").SetBorderColor(tcell.ColorGray)
+	graphBox.SetBorder(true).SetTitle(" STATUS ").SetBorderColor(p.Muted)
 
 	grid := tview.NewGrid().
 		SetRows(3, 2, 1, 10, 0, 1).
@@ -90,13 +116,17 @@ func RunTUI() error {
 	grid.AddItem(pingBox, 4, 2, 1, 1, 0, 0, false)
 	grid.AddItem(jitterBox, 4, 3, 1, 1, 0, 0, false)
 
-	footer := tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true).
-		SetText("[white]Press [yellow]? [white]Help | [yellow]C [white]Copy | [yellow]R [white]Restart | [yellow]H [white]History | [red]Esc [white]Close | [red]Ctrl+C [white]Exit")
+	fgHex := p.ForegroundHex[1:]
+	warnHex := p.WarningHex[1:]
+	errHex := p.ErrorHex[1:]
+
+	footer = tview.NewTextView().SetTextAlign(tview.AlignCenter).SetDynamicColors(true).
+		SetText(fmt.Sprintf("[#%s]Press [#%s]? [#%s]Help | [#%s]C [#%s]Copy | [#%s]R [#%s]Restart | [#%s]H [#%s]History | [#%s]Esc [#%s]Close | [#%s]Ctrl+C [#%s]Exit",
+			fgHex, warnHex, fgHex, warnHex, fgHex, warnHex, fgHex, warnHex, fgHex, errHex, fgHex, errHex, fgHex))
 	grid.AddItem(footer, 5, 0, 1, 4, 0, 0, false)
 
 	pages.AddPage("main", grid, true, true)
 
-	// Add help modal
 	showHelp()
 
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -169,6 +199,24 @@ func RunTUI() error {
 			}
 		}
 		return event
+	})
+
+	theme.Global().OnChange(func(p theme.Palette) {
+		app.QueueUpdateDraw(func() {
+			downloadBox.SetBorderColor(p.Success)
+			uploadBox.SetBorderColor(p.Secondary)
+			pingBox.SetBorderColor(p.Warning)
+			jitterBox.SetBorderColor(p.Accent)
+			graphBox.SetBorderColor(p.Muted)
+			header.SetText(fmt.Sprintf("\n[#%s]─── AURASPEED PRO: ADVANCED NETWORK ANALYZER ───", p.PrimaryHex[1:]))
+
+			fgHex := p.ForegroundHex[1:]
+			warnHex := p.WarningHex[1:]
+			errHex := p.ErrorHex[1:]
+
+			footer.SetText(fmt.Sprintf("[#%s]Press [#%s]? [#%s]Help | [#%s]C [#%s]Copy | [#%s]R [#%s]Restart | [#%s]H [#%s]History | [#%s]Esc [#%s]Close | [#%s]Ctrl+C [#%s]Exit",
+				fgHex, warnHex, fgHex, warnHex, fgHex, warnHex, fgHex, warnHex, fgHex, errHex, fgHex, errHex, fgHex))
+		})
 	})
 
 	go runAdvancedTest()
@@ -260,14 +308,16 @@ func runAdvancedTest() {
 		return
 	}
 
-	// Re-initialize server context to avoid nil pointer panic
 	if s.Context == nil {
 		logger.Warn("Server context is nil, setting to speedtest client")
 		s.Context = speedtestClient
 	}
 
 	app.QueueUpdateDraw(func() {
-		infoBar.SetText(fmt.Sprintf("[yellow]ISP: [white]%s (%s)  [yellow]Server: [white]%s", user.Isp, user.IP, s.Name))
+		p := currentPalette()
+		infoBar.SetText(fmt.Sprintf("[#%s]ISP: [#%s]%s (%s)  [#%s]Server: [#%s]%s",
+			p.WarningHex[1:], p.ForegroundHex[1:], user.Isp, user.IP,
+			p.WarningHex[1:], p.ForegroundHex[1:], s.Name))
 		pingBox.SetText(fmt.Sprintf("\n%d", s.Latency.Milliseconds()))
 	})
 
@@ -325,30 +375,43 @@ func updateStatus(msg string) {
 }
 
 func showHelp() {
-	helpText := `[yellow]AuraSpeed Keyboard Shortcuts[white]
+	p := currentPalette()
+
+	helpText := fmt.Sprintf(`[#%s]AuraSpeed Keyboard Shortcuts[#%s]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[cyan]General[white]
-  [yellow]?[white] or [yellow]F1[white]   Toggle this help
-  [yellow]Ctrl+C[white]   Exit application
+[#%s]General[#%s]
+  [#%s]?[#%s] or [#%s]F1[#%s]   Toggle this help
+  [#%s]Ctrl+C[#%s]   Exit application
 
-[cyan]Speed Test[white]
-  [yellow]R[white]         Restart speed test
-  [yellow]Esc[white]        Close popups/Cancel
+[#%s]Speed Test[#%s]
+  [#%s]R[#%s]         Restart speed test
+  [#%s]Esc[#%s]        Close popups/Cancel
 
-[cyan]Results[white]
-  [yellow]C[white]         Copy results to clipboard
-  [yellow]H[white]         View test history
+[#%s]Results[#%s]
+  [#%s]C[#%s]         Copy results to clipboard
+  [#%s]H[#%s]         View test history
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[gray]Results are automatically saved to history
-      if savehistory is enabled in config[white]`
+[#%s]Results are automatically saved to history
+      if savehistory is enabled in config[#%s]`,
+		p.PrimaryHex[1:], p.ForegroundHex[1:],
+		p.SecondaryHex[1:], p.ForegroundHex[1:],
+		p.WarningHex[1:], p.ForegroundHex[1:], p.WarningHex[1:], p.ForegroundHex[1:],
+		p.WarningHex[1:], p.ForegroundHex[1:],
+		p.SecondaryHex[1:], p.ForegroundHex[1:],
+		p.WarningHex[1:], p.ForegroundHex[1:],
+		p.WarningHex[1:], p.ForegroundHex[1:],
+		p.SecondaryHex[1:], p.ForegroundHex[1:],
+		p.WarningHex[1:], p.ForegroundHex[1:],
+		p.WarningHex[1:], p.ForegroundHex[1:],
+		p.MutedHex[1:], p.ForegroundHex[1:])
 
 	helpView := tview.NewTextView().
 		SetDynamicColors(true).
 		SetTextAlign(tview.AlignCenter).
 		SetText(helpText)
-	helpView.SetBorder(true).SetTitle(" HELP ").SetBorderColor(tcell.ColorTeal)
+	helpView.SetBorder(true).SetTitle(" HELP ").SetBorderColor(p.Primary)
 
 	modal := tview.NewGrid().SetColumns(0, 60, 0).SetRows(0, 14, 0).
 		AddItem(helpView, 1, 1, 1, 1, 0, 0, true)

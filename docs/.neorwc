@@ -1,0 +1,7 @@
+{
+  "provider": "google",
+  "model": "gemini-3-flash-preview",
+  "ctx": 1048576,
+  "lastRun": "2026-05-14T06:19:35.841Z",
+  "lastUpdated": "2026-05-14T06:19:35.844Z"
+}

@@ -15,7 +15,9 @@ import (
 	"auraspeed/internal/info"
 	"auraspeed/internal/network"
 	"auraspeed/internal/speedtest"
+	"auraspeed/internal/theme"
 
+	"github.com/charmbracelet/huh"
 	st "github.com/showwin/speedtest-go/speedtest"
 
 	"github.com/spf13/cobra"
@@ -576,6 +578,80 @@ func newConfigResetCmd() *cobra.Command {
 	}
 }
 
+func newConfigThemeCmd() *cobra.Command {
+	var selected string
+
+	return &cobra.Command{
+		Use:   "theme",
+		Short: "Select a color theme (interactive)",
+		Long:  "Open an interactive theme selector to choose a color scheme for the TUI.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			themeNames := theme.ThemeDisplayNames()
+			themeKeys := theme.ThemeNames()
+
+			selected = theme.Global().Get().Name
+
+			options := make([]huh.Option[string], len(themeNames))
+			for i, name := range themeNames {
+				options[i] = huh.NewOption(name, themeKeys[i])
+			}
+
+			form := huh.NewForm(
+				huh.NewGroup(
+					huh.NewSelect[string]().
+						Title("Choose a theme").
+						Description("Select a color theme for the AuraSpeed TUI").
+						Value(&selected).
+						Options(options...),
+				),
+			)
+
+			if err := form.Run(); err != nil {
+				return fmt.Errorf("theme selection cancelled: %w", err)
+			}
+
+			viper.Set("ui.theme", selected)
+			if err := viper.WriteConfig(); err != nil {
+				return fmt.Errorf("failed to write config: %w", err)
+			}
+
+			cfg := config.Get()
+			cfg.UI.Theme = selected
+			config.ApplyTheme(cfg)
+
+			fmt.Printf("Theme set to %q\n", selected)
+			return nil
+		},
+	}
+}
+
+func newConfigToggleDarkCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "toggle-dark",
+		Short: "Toggle dark mode override",
+		Long:  "Toggle the dark mode override. When enabled, forces the dark theme regardless of the selected theme.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			current := viper.GetBool("ui.darkmode")
+			newVal := !current
+			viper.Set("ui.darkmode", newVal)
+			if err := viper.WriteConfig(); err != nil {
+				return fmt.Errorf("failed to write config: %w", err)
+			}
+
+			cfg := config.Get()
+			cfg.UI.DarkMode = newVal
+			config.ApplyTheme(cfg)
+
+			if newVal {
+				fmt.Println("Dark mode override enabled (forced to dark theme)")
+			} else {
+				fmt.Println("Dark mode override disabled (using selected theme)")
+			}
+			return nil
+		},
+	}
+}
+
 // NewConfigCommand returns the config subcommand.
 // It views, sets, and resets configuration values.
 func NewConfigCommand() *cobra.Command {
@@ -595,6 +671,8 @@ func NewConfigCommand() *cobra.Command {
 	cmd.AddCommand(newConfigViewCmd())
 	cmd.AddCommand(newConfigSetCmd())
 	cmd.AddCommand(newConfigResetCmd())
+	cmd.AddCommand(newConfigThemeCmd())
+	cmd.AddCommand(newConfigToggleDarkCmd())
 
 	return cmd
 }
