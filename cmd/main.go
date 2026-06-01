@@ -12,7 +12,21 @@ import (
 	"auraspeed/internal/speedtest"
 )
 
+var (
+	Version        string
+	Commit         string
+	PublisherName  string
+	PublisherEmail string
+)
+
 func main() {
+	if Version != "" {
+		root.Version = Version
+	}
+	if Commit != "" {
+		root.Commit = Commit
+	}
+
 	if err := config.Init("auraspeed"); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to initialize config: %v\n", err)
 		os.Exit(1)
