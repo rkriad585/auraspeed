@@ -30,7 +30,8 @@ The configuration file is stored in TOML format:
   paralleluploads = 2
 
 [ui]
-  theme = "default"
+  theme = "sunny-beach"
+  darkmode = false
   graphheight = 8
   historylimit = 100
   autorefresh = false
@@ -107,9 +108,11 @@ Settings in the `[ui]` section control the terminal UI appearance and behavior.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `theme` | string | `"default"` | UI theme name |
+| `theme` | string | `"sunny-beach"` | UI theme name |
+| `darkmode` | bool | `false` | Force dark theme override |
 | `graphheight` | int | `8` | Height of the throughput graph in rows |
 | `historylimit` | int | `100` | Maximum number of history entries to keep |
+| `darkmode` | bool | `false` | Force dark theme override |
 | `autorefresh` | bool | `false` | Auto-refresh TUI display |
 | `refreshrate` | int | `5` | Refresh rate in seconds (if autorefresh enabled) |
 | `savehistory` | bool | `true` | Save test results to history file |
@@ -119,6 +122,21 @@ Settings in the `[ui]` section control the terminal UI appearance and behavior.
 **Set dark theme:**
 ```bash
 auraspeed config set ui.theme dark
+```
+
+**Interactive theme selector:**
+```bash
+auraspeed config theme
+```
+
+**List available themes:**
+```bash
+auraspeed config theme --list
+```
+
+**Toggle dark mode:**
+```bash
+auraspeed config toggle-dark
 ```
 
 **Increase graph height:**

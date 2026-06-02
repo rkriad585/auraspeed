@@ -146,7 +146,16 @@ auraspeed config view
 ### Change Theme
 
 ```bash
+auraspeed config theme                   # Interactive selector
+auraspeed config theme dark              # Set directly
+auraspeed config theme --list            # List all themes
 auraspeed config set ui.theme dark
+```
+
+### Toggle Dark Mode
+
+```bash
+auraspeed config toggle-dark
 ```
 
 ### Set Custom Timeout

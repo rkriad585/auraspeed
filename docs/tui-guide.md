@@ -32,4 +32,3 @@ By pressing `C`, AuraSpeed formats your latest results (Download, Upload, Ping, 
 ### History Overlay
 The history view within the TUI allows you to scroll through previous tests without leaving the interactive session.
 
-written by Neorwc

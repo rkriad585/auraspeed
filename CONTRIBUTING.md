@@ -141,9 +141,15 @@ AuraSpeed follows standard Go project layout conventions:
 | Command | Description |
 |---------|-------------|
 | `go build -o auraspeed ./cmd/main.go` | Quick local build |
+| `make build` | Build using Makefile |
+| `make test` | Run all tests |
+| `make lint` | Run linters |
+| `make format` | Format source code |
+| `make release` | Build for all platforms |
+| `make clean` | Remove build artifacts |
+| `cmake -B build && cmake --build build` | Build via CMake |
 | `.\build.ps1` | Windows: build for all platforms |
 | `./build.sh` | Unix: build for all platforms |
-| `goreleaser build --snapshot --clean` | GoReleaser snapshot build |
 
 ## 🆘 Getting Help
 

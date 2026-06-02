@@ -133,6 +133,8 @@ Configuration management.
 | `view` | `view [section]` | View all or specific config section |
 | `set` | `set <key> <value>` | Set config value |
 | `reset` | `reset` | Reset to defaults |
+| `theme` | `theme [name]` | Interactive theme selector or set by name |
+| `toggle-dark` | `toggle-dark` | Toggle dark mode override |
 
 **Examples:**
 
@@ -140,6 +142,10 @@ Configuration management.
 auraspeed config view
 auraspeed config view speedtest
 auraspeed config set speedtest.timeout 60
+auraspeed config theme
+auraspeed config theme dark
+auraspeed config theme --list
+auraspeed config toggle-dark
 auraspeed config reset
 ```
 

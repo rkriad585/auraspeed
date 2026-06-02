@@ -58,19 +58,36 @@ Fastest method, no Go required. Download the correct binary for your OS from [Au
 ### Option 2: Build from Source
 Requires Go 1.21+.
 
-#### Windows
-Run the provided build script in PowerShell:
+#### Quick Build (Any Platform)
+```bash
+git clone https://github.com/rkriad585/auraspeed.git
+cd auraspeed
+go build -o auraspeed ./cmd/main.go
+```
+
+#### Using Make (Any Platform)
+```bash
+make build
+make test
+```
+
+#### Using CMake (Any Platform)
+```bash
+cmake -B build
+cmake --build build --target build
+```
+
+#### Windows (PowerShell Build Script)
 ```powershell
 .\build.ps1
 ```
-Output binary: `dist/auraspeed-windows-amd64.exe`
+Output binary: `bin/auraspeed-windows-amd64.exe`
 
-#### Linux/macOS
-Run the provided build script in your terminal:
+#### Linux/macOS (Bash Build Script)
 ```bash
 ./build.sh
 ```
-Output binaries: `dist/` folder with linux, darwin (amd64/arm64) binaries.
+Output binaries: `bin/` folder with linux, darwin (amd64/arm64) binaries.
 
 ---
 
@@ -169,7 +186,8 @@ Edit the config file to customize behavior:
   paralleluploads = 2
 
 [ui]
-  theme = "default"
+  theme = "sunny-beach"
+  darkmode = false
   savehistory = true
 ```
 
@@ -182,7 +200,8 @@ Edit the config file to customize behavior:
 | speedtest | defaultserverid | int | 0 | Fixed speed test server ID (0 = auto) |
 | speedtest | paralleldownloads | int | 4 | Concurrent download connections |
 | speedtest | paralleluploads | int | 2 | Concurrent upload connections |
-| ui | theme | string | default | TUI theme (default, dark, light) |
+| ui | theme | string | sunny-beach | TUI theme (run `config theme --list` to see all 13) |
+| ui | darkmode | boolean | false | Force dark theme override |
 | ui | savehistory | boolean | true | Save TUI command history |
 
 ---

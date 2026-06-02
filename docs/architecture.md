@@ -57,21 +57,14 @@ Uses **Viper** for hierarchical configuration with TOML files.
 
 **Config file location:** `~/.config/neostore/auraspeed/config.toml`
 
-```toml
-[global]
-log_level = "info"
-no_color = false
+### `internal/theme` — Color Theme System
 
-[speedtest]
-server_id = ""
-threads = 4
+Provides 13 built-in themes with semantic color slots (Background, Surface, Primary, Secondary, Accent, Foreground, Success, Warning, Error). Exposes a `ThemeManager` singleton for runtime theme switching.
 
-[ui]
-theme = "default"
-
-[aliases]
-st = "speedtest"
-```
+| File | Responsibility |
+|------|----------------|
+| `theme.go` | Theme palettes, color definitions |
+| `manager.go` | ThemeManager singleton, listeners |
 
 ### `internal/speedtest` — Core Speed Test Engine
 
@@ -212,19 +205,25 @@ auraspeed tui
 ## Build System
 
 ```
-┌─────────────────────────────────────────┐
-│              Build Targets              │
-├─────────────────────────────────────────┤
-│  make build       → Local binary        │
-│  make test        → Run all tests       │
-│  make lint        → golangci-lint       │
-│  ./build.sh       → Unix release build  │
-│  ./build.ps1      → Windows build       │
-│  goreleaser       → Multi-platform      │
-└─────────────────────────────────────────┘
+┌───────────────────────────────────────────┐
+│              Build Targets                │
+├───────────────────────────────────────────┤
+│  make build        → Local binary         │
+│  make build-all    → All platforms        │
+│  make test         → Run all tests        │
+│  make lint         → golangci-lint + vet  │
+│  make format       → go fmt               │
+│  make release      → Release build        │
+│  make clean        → Remove artifacts     │
+│  cmake -B build    → CMake configure      │
+│  cmake --build build → CMake build        │
+│  ./build.sh        → Unix release build   │
+│  ./build.ps1       → Windows build        │
+│  docker build      → Docker image         │
+└───────────────────────────────────────────┘
 ```
 
-**GoReleaser** (`.goreleaser.yaml`) produces:
+**GitHub Actions** (`.github/workflows/`) produces release binaries for:
 - Linux (amd64, arm64)
 - macOS (amd64, arm64)
 - Windows (amd64, arm64)
