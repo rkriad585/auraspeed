@@ -37,6 +37,7 @@ type Config struct {
 	Global    GlobalConfig      `mapstructure:"global"`
 	Speedtest SpeedtestConfig   `mapstructure:"speedtest"`
 	UI        UIConfig          `mapstructure:"ui"`
+	Network   NetworkConfig     `mapstructure:"network"`
 	Aliases   map[string]string `mapstructure:"aliases"`
 }
 
@@ -54,6 +55,11 @@ type SpeedtestConfig struct {
 	Timeout           int `mapstructure:"timeout"`
 	ParallelDownloads int `mapstructure:"paralleldownloads"`
 	ParallelUploads   int `mapstructure:"paralleluploads"`
+}
+
+// NetworkConfig holds network-related settings.
+type NetworkConfig struct {
+	Proxy string `mapstructure:"proxy"`
 }
 
 // UIConfig holds terminal UI related settings.
@@ -118,6 +124,7 @@ func Init(appName string) error {
 
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(configFile)
+	viper.SetDefault("network.proxy", "")
 	viper.SetDefault("global.loglevel", "info")
 	viper.SetDefault("global.nocolor", false)
 	viper.SetDefault("global.autoupdate", true)
@@ -225,6 +232,7 @@ func GetDefaultConfig() Config {
 			ParallelDownloads: 4,
 			ParallelUploads:   2,
 		},
+		Network: NetworkConfig{},
 		UI: UIConfig{
 			Theme:        "sunny-beach",
 			DarkMode:     false,

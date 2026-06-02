@@ -19,7 +19,7 @@ var (
 	cfg    *config.Config
 
 	// Version is the build version, set at build time via ldflags.
-	Version = "v3.1.6"
+	Version = "v3.1.7"
 	// Commit is the git commit hash, set at build time via ldflags.
 	Commit = "none"
 	// BuildTime is the build timestamp, set at build time via ldflags.
@@ -191,6 +191,7 @@ func init() {
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(NewWebCommand())
 	rootCmd.AddCommand(NewUpdateCommand())
+	rootCmd.AddCommand(NewSelfUpdateCommand())
 	rootCmd.AddCommand(NewServersCommand())
 	rootCmd.AddCommand(NewInstallCommand())
 	rootCmd.AddCommand(newCompletionCmd())
