@@ -190,7 +190,6 @@ func init() {
 	rootCmd.AddCommand(NewConfigCommand())
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(NewWebCommand())
-	rootCmd.AddCommand(NewUpdateCommand())
 	rootCmd.AddCommand(NewSelfUpdateCommand())
 	rootCmd.AddCommand(NewServersCommand())
 	rootCmd.AddCommand(NewInstallCommand())
