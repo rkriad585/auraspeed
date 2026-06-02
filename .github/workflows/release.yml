@@ -160,14 +160,14 @@ jobs:
             cc:       aarch64-linux-gnu-gcc
 
           - label:    darwin/amd64
-            runner:   macos-13
+            runner:   macos-latest
             goos:     darwin
             goarch:   amd64
             ext:      ''
             cc:       ''
 
           - label:    darwin/arm64
-            runner:   macos-14
+            runner:   macos-latest
             goos:     darwin
             goarch:   arm64
             ext:      ''
