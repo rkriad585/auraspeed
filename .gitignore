@@ -1,6 +1,7 @@
 # Build artifacts
 auraspeed.exe
 auraspeed_step*.exe
+auraspeed_*.exe
 auraspeed-*
 *.service
 dist/

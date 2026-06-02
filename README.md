@@ -258,7 +258,7 @@ Or with version metadata:
 
 ```bash
 docker build \
-  --build-arg VERSION=v3.1.5 \
+  --build-arg VERSION=v3.1.6 \
   --build-arg COMMIT=$(git rev-parse --short HEAD) \
   --build-arg BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
   -t auraspeed .

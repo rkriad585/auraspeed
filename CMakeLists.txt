@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(auraspeed
-  VERSION 3.1.5
+  VERSION 3.1.6
   DESCRIPTION "Cross-platform terminal tool for network diagnostics"
   LANGUAGES NONE
 )
