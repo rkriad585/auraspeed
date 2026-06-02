@@ -221,7 +221,7 @@ jobs:
           echo " Commit : ${COMMIT}"
           echo "-------------------------------------------"
 
-          go build -trimpath -ldflags "${LDFLAGS}" -o "${OUTFILE}" .
+          go build -trimpath -ldflags "${LDFLAGS}" -o "${OUTFILE}" ./cmd/main.go
 
           ls -lh "${OUTFILE}"
           echo "OUTFILE=${OUTFILE}" >> "$GITHUB_ENV"
