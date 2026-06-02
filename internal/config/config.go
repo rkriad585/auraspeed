@@ -13,7 +13,7 @@ import (
 
 func ApplyTheme(cfg *Config) {
 	themeName := cfg.UI.Theme
-	if themeName == "" {
+	if themeName == "" || themeName == "default" {
 		themeName = "sunny-beach"
 	}
 	if cfg.UI.DarkMode {
@@ -154,6 +154,12 @@ func Init(appName string) error {
 	var parsed Config
 	if err := viper.Unmarshal(&parsed); err != nil {
 		return fmt.Errorf("failed to unmarshal config: %w", err)
+	}
+
+	if parsed.UI.Theme == "" || parsed.UI.Theme == "default" {
+		parsed.UI.Theme = "sunny-beach"
+		viper.Set("ui.theme", "sunny-beach")
+		_ = viper.WriteConfig()
 	}
 
 	if err := parsed.Validate(); err != nil {

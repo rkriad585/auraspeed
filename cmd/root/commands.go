@@ -579,29 +579,66 @@ func newConfigResetCmd() *cobra.Command {
 }
 
 func newConfigThemeCmd() *cobra.Command {
-	var selected string
+	var listThemes bool
 
-	return &cobra.Command{
-		Use:   "theme",
-		Short: "Select a color theme (interactive)",
-		Long:  "Open an interactive theme selector to choose a color scheme for the TUI.",
+	cmd := &cobra.Command{
+		Use:   "theme [name]",
+		Short: "Set or view the color theme",
+		Long: `Set the color theme by name, or run with no arguments for an interactive selector.
+
+Examples:
+  auraspeed config theme          Interactive theme selector (huh)
+  auraspeed config theme --list   List all available themes
+  auraspeed config theme dark     Set theme to "dark" directly`,
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			themeNames := theme.ThemeDisplayNames()
-			themeKeys := theme.ThemeNames()
+			themeNames := theme.ThemeNames()
+			themeDisplay := theme.ThemeDisplayNames()
 
-			selected = theme.Global().Get().Name
+			if listThemes {
+				fmt.Println("Available themes:")
+				for i, name := range themeNames {
+					cur := ""
+					if name == theme.Global().Get().Name {
+						cur = " (current)"
+					}
+					fmt.Printf("  %-20s %s%s\n", name, themeDisplay[i], cur)
+				}
+				return nil
+			}
 
+			if len(args) == 1 {
+				selected := args[0]
+				valid := false
+				for _, name := range themeNames {
+					if name == selected {
+						valid = true
+						break
+					}
+				}
+				if !valid {
+					fmt.Fprintf(os.Stderr, "Unknown theme %q.\n", selected)
+					fmt.Println("Use 'auraspeed config theme --list' to see available themes.")
+					return fmt.Errorf("unknown theme: %s", selected)
+				}
+				applyTheme(selected)
+				return nil
+			}
+
+			var chosen string
 			options := make([]huh.Option[string], len(themeNames))
 			for i, name := range themeNames {
-				options[i] = huh.NewOption(name, themeKeys[i])
+				options[i] = huh.NewOption(themeDisplay[i], name)
 			}
+
+			chosen = theme.Global().Get().Name
 
 			form := huh.NewForm(
 				huh.NewGroup(
 					huh.NewSelect[string]().
 						Title("Choose a theme").
-						Description("Select a color theme for the AuraSpeed TUI").
-						Value(&selected).
+						Description("Pick a color scheme for the AuraSpeed TUI").
+						Value(&chosen).
 						Options(options...),
 				),
 			)
@@ -610,19 +647,26 @@ func newConfigThemeCmd() *cobra.Command {
 				return fmt.Errorf("theme selection cancelled: %w", err)
 			}
 
-			viper.Set("ui.theme", selected)
-			if err := viper.WriteConfig(); err != nil {
-				return fmt.Errorf("failed to write config: %w", err)
-			}
-
-			cfg := config.Get()
-			cfg.UI.Theme = selected
-			config.ApplyTheme(cfg)
-
-			fmt.Printf("Theme set to %q\n", selected)
+			applyTheme(chosen)
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolVar(&listThemes, "list", false, "List all available themes")
+	return cmd
+}
+
+func applyTheme(name string) {
+	viper.Set("ui.theme", name)
+	if err := viper.WriteConfig(); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: failed to write config: %v\n", err)
+	}
+
+	cfg := config.Get()
+	cfg.UI.Theme = name
+	config.ApplyTheme(cfg)
+
+	fmt.Printf("Theme set to %q.\n", name)
 }
 
 func newConfigToggleDarkCmd() *cobra.Command {

@@ -5,7 +5,6 @@ go 1.25.0
 require (
 	github.com/atotto/clipboard v0.1.4
 	github.com/gdamore/tcell/v2 v2.13.8
-	github.com/guptarohit/asciigraph v0.7.3
 	github.com/mattn/go-colorable v0.1.13
 	github.com/rivo/tview v0.42.0
 	github.com/rs/zerolog v1.33.0
