@@ -157,4 +157,8 @@ AuraSpeed follows standard Go project layout conventions:
 - Check existing issues before creating a new one
 - Include your OS, Go version, and AuraSpeed version when reporting bugs
 
+## Contributors
+
+- rkriad585
+
 Thank you for contributing to AuraSpeed! 🚀
