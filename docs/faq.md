@@ -78,6 +78,14 @@ Only if building from source. Pre-built binaries don't require Go.
 | Linux | `~/.config/neostore/auraspeed/config.toml` |
 | macOS | `~/.config/neostore/auraspeed/config.toml` |
 
+### Where are logs and exported files stored?
+
+| Item | Path |
+|------|------|
+| History | `~/.config/neostore/auraspeed/data/history.json` |
+| Logs | `~/.config/neostore/auraspeed/logs/` |
+| Exported files | `~/Downloads/neostore/auraspeed/` |
+
 ---
 
 ## Speed Test

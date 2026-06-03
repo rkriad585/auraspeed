@@ -12,6 +12,37 @@ The configuration file is stored in TOML format:
 | Linux | `~/.config/neostore/auraspeed/config.toml` |
 | macOS | `~/.config/neostore/auraspeed/config.toml` |
 
+### Project Directory Structure
+
+| Directory | Path | Purpose |
+|-----------|------|---------|
+| Config | `~/.config/neostore/auraspeed/` | Main config (`config.toml`), aliases |
+| Data | `~/.config/neostore/auraspeed/data/` | Speed test history, server cache |
+| Logs | `~/.config/neostore/auraspeed/logs/` | Application logs |
+| Downloads | `~/Downloads/neostore/auraspeed/` | Exported output files |
+
+### Configuration API (`internal/config`)
+
+```go
+import "auraspeed/internal/config"
+
+// Paths
+config.GetConfigDir()        // ~/.config/neostore/auraspeed/
+config.GetConfigFile()       // ~/.config/neostore/auraspeed/config.toml
+config.GetDataDir()          // ~/.config/neostore/auraspeed/data/
+config.GetLogsDir()          // ~/.config/neostore/auraspeed/logs/
+config.GetDownloadsDir()     // ~/Downloads/neostore/auraspeed/
+config.GetHistoryFile()      // ~/.config/neostore/auraspeed/data/history.json
+
+// Helpers
+config.ConfigFile("servers.json")  // ~/.config/neostore/auraspeed/servers.json
+config.EnsureConfigDir()           // create all dirs if missing
+
+// Runtime
+config.Get()               // current *Config
+config.ApplyTheme(cfg)     // apply theme from config
+```
+
 ---
 
 ## Default Configuration

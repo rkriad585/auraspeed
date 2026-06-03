@@ -75,7 +75,7 @@ func homeDir() string {
 }
 
 func ConfigDir() string {
-	return filepath.Join(homeDir(), ".config", "neostore", "auraspeed")
+	return config.GetConfigDir()
 }
 
 func selfUninstall() int {

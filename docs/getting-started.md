@@ -171,6 +171,14 @@ AuraSpeed uses a TOML config file, created automatically on first run.
 | Linux | `~/.config/neostore/auraspeed/config.toml` |
 | macOS | `~/.config/neostore/auraspeed/config.toml` |
 
+### Directory Structure
+| Directory | Path | Purpose |
+|-----------|------|---------|
+| Config | `~/.config/neostore/auraspeed/` | Config file, settings |
+| Data | `~/.config/neostore/auraspeed/data/` | History, server cache |
+| Logs | `~/.config/neostore/auraspeed/logs/` | Application logs |
+| Downloads | `~/Downloads/neostore/auraspeed/` | Exported output files |
+
 ### Default Config Options
 Edit the config file to customize behavior:
 ```toml

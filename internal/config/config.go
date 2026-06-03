@@ -24,12 +24,14 @@ func ApplyTheme(cfg *Config) {
 }
 
 var (
-	cfg         *Config
-	cfgMu       sync.RWMutex
-	configDir   string
-	configFile  string
-	historyFile string
-	dataDir     string
+	cfg          *Config
+	cfgMu        sync.RWMutex
+	configDir    string
+	configFile   string
+	historyFile  string
+	dataDir      string
+	logsDir      string
+	downloadsDir string
 )
 
 // Config holds all configuration for AuraSpeed.
@@ -97,10 +99,12 @@ func Init(appName string) error {
 
 	configDir = filepath.Join(home, ".config", "neostore", appName)
 	dataDir = filepath.Join(configDir, "data")
+	logsDir = filepath.Join(configDir, "logs")
+	downloadsDir = filepath.Join(home, "Downloads", "neostore", appName)
 	configFile = filepath.Join(configDir, "config.toml")
 	historyFile = filepath.Join(dataDir, "history.json")
 
-	for _, dir := range []string{configDir, dataDir} {
+	for _, dir := range []string{configDir, dataDir, logsDir, downloadsDir} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
@@ -288,6 +292,31 @@ func GetHistoryFile() string {
 // GetConfigFile returns the config file path.
 func GetConfigFile() string {
 	return configFile
+}
+
+// ConfigFile returns a path inside the config directory for a named file.
+func ConfigFile(name string) string {
+	return filepath.Join(configDir, name)
+}
+
+// GetLogsDir returns the logs directory path.
+func GetLogsDir() string {
+	return logsDir
+}
+
+// GetDownloadsDir returns the downloads/output directory path.
+func GetDownloadsDir() string {
+	return downloadsDir
+}
+
+// EnsureConfigDir creates the config directory and all subdirectories.
+func EnsureConfigDir() error {
+	for _, dir := range []string{configDir, dataDir, logsDir, downloadsDir} {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("failed to create directory %s: %w", dir, err)
+		}
+	}
+	return nil
 }
 
 // ensureFilePermissions checks if a file has the expected permissions and fixes them if not.

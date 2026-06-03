@@ -46,14 +46,18 @@ Manage speed test servers.
 Manage application settings.
 - `auraspeed config view`: Show current configuration.
 - `auraspeed config set [key] [value]`: Update a setting.
+- `auraspeed config theme [name]`: Change UI theme (interactive if no name).
+- `auraspeed config toggle-dark`: Toggle dark mode override.
 - `auraspeed config reset`: Restore defaults.
+
+### `self-update`
+Checks for and replaces the running binary with the latest release from GitHub.
+Supports Windows safe replacement (rename → replace → cleanup).
+- **Flags:** `--proxy, -p` (Proxy URL for download).
 
 ### `web`
 Starts the HTTP server for remote diagnostics.
 - **Flags:** `--port, -p` (Default: 8080).
-
-### `update`
-Checks for and installs the latest version from GitHub.
 
 ### `install`
 (Linux only) Installs AuraSpeed as a `systemd` service.

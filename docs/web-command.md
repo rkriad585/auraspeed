@@ -165,6 +165,14 @@ Config file location:
 - Windows: `%USERPROFILE%\.config\neostore\auraspeed\config.toml`
 - Linux/macOS: `~/.config/neostore/auraspeed/config.toml`
 
+Project directory:
+| Directory | Path |
+|-----------|------|
+| Config root | `~/.config/neostore/auraspeed/` |
+| Data | `~/.config/neostore/auraspeed/data/` |
+| Logs | `~/.config/neostore/auraspeed/logs/` |
+| Downloads | `~/Downloads/neostore/auraspeed/` |
+
 ---
 
 ## Security Considerations

@@ -55,7 +55,17 @@ Uses **Viper** for hierarchical configuration with TOML files.
 | `config.go` | Load/save config, defaults, validation |
 | `config_test.go` | Unit tests for config operations |
 
-**Config file location:** `~/.config/neostore/auraspeed/config.toml`
+**Config directory:** `~/.config/neostore/auraspeed/`  
+**Directory structure:**
+```
+~/.config/neostore/auraspeed/
+├── config.toml          # Main configuration
+├── data/
+│   ├── history.json     # Speed test history
+│   └── servers.json     # Cached server list
+└── logs/                # Application logs
+~/Downloads/neostore/auraspeed/  # Exported output files
+```
 
 ### `internal/theme` — Color Theme System
 

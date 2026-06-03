@@ -120,6 +120,15 @@ auraspeed tui
 
 ## Configuration Issues
 
+### Project Directory Structure
+
+| Directory | Path |
+|-----------|------|
+| Config | `~/.config/neostore/auraspeed/` |
+| Data | `~/.config/neostore/auraspeed/data/` |
+| Logs | `~/.config/neostore/auraspeed/logs/` |
+| Downloads | `~/Downloads/neostore/auraspeed/` |
+
 ### Error: `Config file not found`
 
 **Cause:** First run or config file deleted.

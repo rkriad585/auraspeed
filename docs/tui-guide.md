@@ -32,3 +32,6 @@ By pressing `C`, AuraSpeed formats your latest results (Download, Upload, Ping, 
 ### History Overlay
 The history view within the TUI allows you to scroll through previous tests without leaving the interactive session.
 
+### Runtime Configuration
+Theme changes are applied immediately in the TUI. Run `auraspeed config theme` or `auraspeed config toggle-dark` outside the TUI to switch themes at runtime — the next TUI launch reflects the change. Config is stored at `~/.config/neostore/auraspeed/config.toml`.
+

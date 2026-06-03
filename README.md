@@ -167,6 +167,29 @@ AuraSpeed uses TOML configuration at:
   hist = "history"
 ```
 
+### Project Directories
+
+| Directory | Path | Purpose |
+|-----------|------|---------|
+| Config | `~/.config/neostore/auraspeed/` | Config file, aliases |
+| Data | `~/.config/neostore/auraspeed/data/` | History, server cache |
+| Logs | `~/.config/neostore/auraspeed/logs/` | Application logs |
+| Downloads | `~/Downloads/neostore/auraspeed/` | Exported output files |
+
+### Configuration API
+
+The `internal/config` package provides these helpers:
+
+```go
+import "auraspeed/internal/config"
+
+config.GetConfigDir()     // ~/.config/neostore/auraspeed/
+config.ConfigFile("x")   // ~/.config/neostore/auraspeed/x
+config.GetLogsDir()      // ~/.config/neostore/auraspeed/logs/
+config.GetDownloadsDir() // ~/Downloads/neostore/auraspeed/
+config.EnsureConfigDir() // create dirs if missing
+```
+
 ### Configuration Options
 
 | Section | Key | Type | Default | Description |
