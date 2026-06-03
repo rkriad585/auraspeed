@@ -6,7 +6,6 @@ auraspeed-*
 *.service
 dist/
 bin/
-/**/**/servers.json
 
 # Go
 *.exe
@@ -27,9 +26,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-# Claude Code
-.claude/
-
 # Temporary
 tmp/
 temp/
@@ -45,5 +41,6 @@ go.sum
 
 # Data files
 history.json
+servers.json
 
 # GoReleaser and CI configs are not ignored
