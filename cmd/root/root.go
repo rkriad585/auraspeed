@@ -19,7 +19,7 @@ var (
 	cfg    *config.Config
 
 	// Version is the build version, set at build time via ldflags.
-	Version = "v3.1.8"
+	Version = "v3.5.0"
 	// Commit is the git commit hash, set at build time via ldflags.
 	Commit = "none"
 	// BuildTime is the build timestamp, set at build time via ldflags.
