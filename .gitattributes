@@ -1,4 +1,9 @@
-* text=auto eol=lf
+* text=auto
 
 *.bat text eol=crlf
 *.ps1 text eol=crlf
+*.sh text eol=lf
+Makefile text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+Dockerfile text eol=lf
