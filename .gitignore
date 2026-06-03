@@ -5,6 +5,8 @@ auraspeed_*.exe
 auraspeed-*
 *.service
 dist/
+bin/
+/**/**/servers.json
 
 # Go
 *.exe
