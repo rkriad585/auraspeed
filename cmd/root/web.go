@@ -16,7 +16,9 @@ import (
 )
 
 // NewWebCommand returns the web subcommand.
-// It starts a web server to expose AuraSpeed functionality via HTTP.
+// NewWebCommand creates a Cobra "web" subcommand that starts the AuraSpeed HTTP server.
+// The returned command exposes a -p/--port flag (default 8080) and invokes startWebServer
+// with the configured port when executed, returning any wrapped error from startup.
 func NewWebCommand() *cobra.Command {
 	var port int
 
@@ -36,6 +38,17 @@ func NewWebCommand() *cobra.Command {
 	return cmd
 }
 
+// startWebServer starts an HTTP server on the specified port that exposes health, speed-test,
+// system information, and a simple HTML UI endpoints.
+//
+// The server registers the following routes:
+//   - GET /health: returns a JSON health status for the service.
+//   - POST /api/speedtest: runs a speed test and returns JSON with `download`, `upload`,
+//     `ping`, `isp`, and `server`. Responds 405 for non-POST requests and 500 on test failures.
+//   - GET /api/info: returns system information as JSON (500 on retrieval failure).
+//   - GET /: serves the embedded HTML UI (500 if the template file cannot be read).
+//
+// The function blocks while the server runs and returns any error produced by ListenAndServe.
 func startWebServer(port int) error {
 	mux := http.NewServeMux()
 
